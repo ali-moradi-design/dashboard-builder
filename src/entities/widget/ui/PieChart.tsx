@@ -49,5 +49,25 @@ export function PieChart({ widget, settings: s, rows, columns, dataset }: Render
       },
     ],
   }
-  return <EChart option={option} label={widget.title} />
+  // Narrow cards: legend below the chart instead of beside it.
+  const responsive = {
+    baseOption: option,
+    media: [
+      {
+        query: { maxWidth: 440 },
+        option: {
+          legend: {
+            orient: 'horizontal' as const,
+            type: 'plain' as const,
+            top: 'auto',
+            bottom: 0,
+            left: 'center',
+            right: 'auto',
+          },
+          series: [{ center: ['50%', '44%'], radius: s.donut ? ['40%', '66%'] : ['0%', '66%'] }],
+        },
+      },
+    ],
+  }
+  return <EChart option={responsive} label={widget.title} />
 }

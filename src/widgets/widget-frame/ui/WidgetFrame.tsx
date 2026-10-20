@@ -105,10 +105,7 @@ export function WidgetFrame({ widget, dateRange, actions, selected, className }:
     >
       {(widget.title || actions) && (
         <header className="mb-1.5 flex min-h-6 items-center gap-2">
-          <h3
-            dir="auto"
-            className="min-w-0 flex-1 truncate text-start text-[13px] font-semibold text-muted"
-          >
+          <h3 className="min-w-0 flex-1 truncate text-start text-[13px] font-semibold text-muted [unicode-bidi:plaintext]">
             {widget.title}
           </h3>
           {actions}

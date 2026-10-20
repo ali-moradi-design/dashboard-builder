@@ -48,23 +48,23 @@ export function Markdown({ source }: { source: string }) {
     <div className="flex flex-col gap-2 text-sm leading-relaxed">
       {blocks.map((b, i) =>
         b.kind === 'p' ? (
-          <p key={i} dir="auto">
+          <p key={i} className="[unicode-bidi:plaintext]">
             <InlineNodes nodes={b.children} />
           </p>
         ) : b.kind === 'h' ? (
           b.level === 1 ? (
-            <h4 key={i} dir="auto" className="text-base font-bold">
+            <h4 key={i} className="text-base font-bold [unicode-bidi:plaintext]">
               <InlineNodes nodes={b.children} />
             </h4>
           ) : (
-            <h5 key={i} dir="auto" className="font-semibold">
+            <h5 key={i} className="font-semibold [unicode-bidi:plaintext]">
               <InlineNodes nodes={b.children} />
             </h5>
           )
         ) : (
           <ul key={i} className="list-disc ps-5">
             {b.items.map((item, j) => (
-              <li key={j} dir="auto">
+              <li key={j} className="[unicode-bidi:plaintext]">
                 <InlineNodes nodes={item} />
               </li>
             ))}

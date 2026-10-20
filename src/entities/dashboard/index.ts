@@ -9,3 +9,4 @@ export {
   parseDashboard,
 } from './model/schema'
 export type { Dashboard } from './model/schema'
+export { useEditor } from './model/editor'

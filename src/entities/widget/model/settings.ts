@@ -7,7 +7,7 @@ import type { WidgetType } from './types'
 const bool = (v: boolean) => z.boolean().catch(v)
 const numberFormat = z.enum(['auto', 'number', 'compact', 'currency', 'percent']).catch('auto')
 const decimals = z.number().int().min(0).max(6).optional().catch(undefined)
-const colorOffset = z.number().int().min(0).max(4).catch(0)
+const colorOffset = z.coerce.number().int().min(0).max(4).catch(0)
 
 const chartBase = {
   format: numberFormat,
@@ -35,12 +35,12 @@ export const settingsSchemas = {
   bar: z.object({ ...chartBase, horizontal: bool(false) }),
   stackedBar: z.object({ ...chartBase, horizontal: bool(false) }),
   pie: z.object({ ...chartBase, donut: bool(true) }),
-  scatter: z.object({ ...chartBase, pointSize: z.number().int().min(2).max(20).catch(6) }),
+  scatter: z.object({ ...chartBase, pointSize: z.coerce.number().int().min(2).max(20).catch(6) }),
   heatmap: z.object({ format: numberFormat, decimals, showLabels: bool(false) }),
   table: z.object({
     format: numberFormat,
     decimals,
-    pageSize: z.number().int().min(3).max(100).catch(10),
+    pageSize: z.coerce.number().int().min(3).max(100).catch(10),
   }),
   heading: z.object({
     subtitle: z.string().max(300).catch(''),
