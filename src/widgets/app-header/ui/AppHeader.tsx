@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutGrid } from 'lucide-react'
+import { LayoutGrid, Settings2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { LanguageSwitch } from '@/features/switch-language'
 import { ThemeSwitch } from '@/features/switch-theme'
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@/shared/ui'
 
 export interface AppHeaderProps {
   /** Breadcrumb after the app name, e.g. the dashboard title. */
@@ -25,7 +26,7 @@ export function AppHeader({ crumbs, actions }: AppHeaderProps) {
       {crumbs && (
         <nav aria-label="breadcrumb" className="flex min-w-0 items-center gap-1.5 text-muted">
           <span aria-hidden>/</span>
-          <span className="truncate font-semibold text-text">{crumbs}</span>
+          <bdi className="truncate font-semibold text-text">{crumbs}</bdi>
         </nav>
       )}
       <div className="flex-1" />
@@ -48,6 +49,26 @@ export function AppHeader({ crumbs, actions }: AppHeaderProps) {
         <LanguageSwitch />
         <ThemeSwitch />
       </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label={t('settings.title')}
+          >
+            <Settings2 aria-hidden />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="flex flex-col gap-3">
+          <nav aria-label={t('common.mainNav')} className="flex gap-3">
+            <Link to="/">{t('common.dashboards')}</Link>
+            <Link to="/datasets">{t('common.datasets')}</Link>
+          </nav>
+          <LanguageSwitch />
+          <ThemeSwitch />
+        </PopoverContent>
+      </Popover>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </header>
   )

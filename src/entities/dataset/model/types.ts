@@ -8,6 +8,8 @@ export interface DatasetField {
   label: LocalizedText
   /** How values of this field are shown. */
   format?: NumberFormatOptions | undefined
+  /** Show numbers as names: ISO weekday (1 = Monday) or hour of day. */
+  display?: 'weekday' | 'hour' | undefined
 }
 
 export type DatasetSource =
