@@ -185,6 +185,13 @@ export const fa: Messages = {
     selectHint: 'برای تغییر تنظیمات، یک ویجت را انتخاب کنید.',
     selectWidget: 'انتخاب ویجت {{title}}',
   },
+  transfer: {
+    export: 'خروجی JSON',
+    import: 'ورود JSON',
+    notJson: 'این فایل JSON معتبر نیست.',
+    tooLarge: 'حجم فایل بیشتر از ۲ مگابایت است.',
+    invalid: 'این فایل داشبورد نیست: {{detail}}',
+  },
   list: {
     title: 'داشبوردها',
     subtitle: 'بدون کدنویسی از داده داشبورد بسازید. همه‌چیز در مرورگر شما اجرا می‌شود.',

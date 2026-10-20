@@ -183,6 +183,13 @@ export const en = {
     selectHint: 'Select a widget to change its settings.',
     selectWidget: 'Select widget {{title}}',
   },
+  transfer: {
+    export: 'Export JSON',
+    import: 'Import JSON',
+    notJson: 'This file is not valid JSON.',
+    tooLarge: 'The file is larger than 2 MB.',
+    invalid: 'This is not a dashboard file: {{detail}}',
+  },
   list: {
     title: 'Dashboards',
     subtitle: 'Build dashboards from data without code. Everything runs in your browser.',
