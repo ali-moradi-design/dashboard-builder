@@ -65,7 +65,11 @@ add features beyond this list without asking.
   count, min, max), group by one or two fields (date fields by day, week, month
   or year), simple filters (AND list), sort, limit. Queries are stored as JSON and
   compiled to safe, parameterized SQL.
-- Widgets (5 types): KPI card, line chart, bar chart, pie/donut chart, table.
+- Widgets (9 types): KPI card, line chart, area chart, bar chart, stacked bar
+  chart, pie/donut chart, scatter plot, heatmap (e.g. weekday × hour), table.
+  The four extra chart types were added by the user on 2026-10-20.
+- The table widget is built with TanStack Table (sortable columns, pagination),
+  in the widget and in the query builder preview.
 - Drag and drop everywhere it helps: drag a widget type from a palette onto the
   grid, move and resize widgets on the grid, and drag dataset fields into the
   query builder (measures, group by, filters).
@@ -77,7 +81,7 @@ add features beyond this list without asking.
 - Light and dark themes; English and Persian.
 
 Not in scope (maybe later, only if the user asks): raw SQL mode, cross-filtering,
-drill-down, more chart types, maps, pivot tables, auto refresh, PNG/CSV
+drill-down, chart types beyond the nine above, maps, pivot tables, auto refresh, PNG/CSV
 export, templates gallery.
 
 ## Colors
