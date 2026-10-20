@@ -6,9 +6,12 @@ every session. Do not add features beyond its scope without asking.
 
 ## Workflow
 
-- Small steps: branch → PR → CI → squash merge into `main`. Test every PR
-  locally (lint, typecheck, unit, build, E2E) before pushing, then wait for CI
-  to be green before merging.
+- Small steps: branch → PR → squash merge into `main`. Test every PR locally
+  before pushing: `pnpm check` (lint, Steiger, format, typecheck, unit, build)
+  and `pnpm e2e`. GitHub Actions CI is added at the end of the build (user
+  decision, 2026-10-20); until then local checks are the gate.
+- Node 24 and pnpm 10. In a sandbox with a preinstalled Chromium, run E2E with
+  `PW_CHROMIUM_PATH=<path to chrome> pnpm e2e`.
 - Explain each step to the user.
 - Do not copy code from the user's former employer's dashboard builder.
 
