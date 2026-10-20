@@ -4,3 +4,5 @@ export { getDataset, useDataset, useDatasets, useDatasetsStore } from './model/s
 export { fieldTypeFromDuckDB, findField, toQuerySchema } from './model/types'
 export type { Dataset, DatasetField, DatasetSource } from './model/types'
 export { FieldTypeIcon } from './ui/FieldTypeIcon'
+export { formatDimensionValue, formatMeasureValue } from './lib/formatValue'
+export { useDateExtent } from './api/extent'

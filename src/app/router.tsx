@@ -2,16 +2,25 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  lazyRouteComponent,
   Outlet,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
-import { DashboardEditPage } from '@/pages/dashboard-edit'
-import { DashboardViewPage } from '@/pages/dashboard-view'
 import { DashboardsListPage } from '@/pages/dashboards-list'
-import { DatasetsPage } from '@/pages/datasets'
+
+// Heavy pages (charts, DuckDB, editor) load on demand.
+const DashboardViewPage = lazyRouteComponent(
+  () => import('@/pages/dashboard-view'),
+  'DashboardViewPage',
+)
+const DashboardEditPage = lazyRouteComponent(
+  () => import('@/pages/dashboard-edit'),
+  'DashboardEditPage',
+)
+const DatasetsPage = lazyRouteComponent(() => import('@/pages/datasets'), 'DatasetsPage')
 
 function NotFound() {
   const { t } = useTranslation()

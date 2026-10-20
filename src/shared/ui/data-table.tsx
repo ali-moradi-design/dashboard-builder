@@ -140,7 +140,9 @@ export function DataTable({
                       alignOf.get(cell.column.id) === 'end' && 'text-end tabular-nums',
                     )}
                   >
-                    <FlexRender cell={cell} />
+                    <bdi>
+                      <FlexRender cell={cell} />
+                    </bdi>
                   </td>
                 ))}
               </tr>
