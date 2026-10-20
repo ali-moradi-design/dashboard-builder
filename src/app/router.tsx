@@ -65,6 +65,7 @@ const editRoute = createRoute({
 const datasetsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/datasets',
+  validateSearch: z.object({ id: z.string().optional().catch(undefined) }),
   component: DatasetsPage,
 })
 

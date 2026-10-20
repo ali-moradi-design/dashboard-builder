@@ -1,5 +1,6 @@
 export const en = {
   common: {
+    mainNav: 'Main',
     appName: 'Dashboard builder',
     dashboards: 'Dashboards',
     datasets: 'Datasets',
@@ -21,6 +22,24 @@ export const en = {
     digits: 'Digits',
     nativeDigits: 'Persian digits',
     latinDigits: 'Latin digits',
+  },
+  table: {
+    rowsOf: 'Rows {{first}}–{{last}} of {{total}}',
+    page: '{{page}} / {{count}}',
+    previous: 'Previous page',
+    next: 'Next page',
+  },
+  datasets: {
+    sample: 'Sample',
+    imported: 'Imported',
+    rows: '{{n}} rows',
+    importCsv: 'Import CSV',
+    importFailed: 'Could not read this CSV file.',
+    tooLarge: 'The file is larger than 50 MB.',
+    privacy: 'Your files stay in this browser. Nothing is uploaded.',
+    fields: 'Fields',
+    preview: 'Preview',
+    useInDashboard: 'Use in a dashboard',
   },
   list: {
     title: 'Dashboards',

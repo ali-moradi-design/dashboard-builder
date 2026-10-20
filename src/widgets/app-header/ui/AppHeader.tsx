@@ -29,6 +29,21 @@ export function AppHeader({ crumbs, actions }: AppHeaderProps) {
         </nav>
       )}
       <div className="flex-1" />
+      <nav aria-label={t('common.mainNav')} className="hidden items-center gap-1 lg:flex">
+        <Link
+          to="/"
+          className="rounded-md px-2.5 py-1.5 text-muted hover:text-text [&.active]:text-text"
+          activeOptions={{ exact: true }}
+        >
+          {t('common.dashboards')}
+        </Link>
+        <Link
+          to="/datasets"
+          className="rounded-md px-2.5 py-1.5 text-muted hover:text-text [&.active]:text-text"
+        >
+          {t('common.datasets')}
+        </Link>
+      </nav>
       <div className="hidden items-center gap-2 md:flex">
         <LanguageSwitch />
         <ThemeSwitch />

@@ -2,6 +2,7 @@ import type { Messages } from './en'
 
 export const fa: Messages = {
   common: {
+    mainNav: 'منوی اصلی',
     appName: 'داشبوردساز',
     dashboards: 'داشبوردها',
     datasets: 'مجموعه‌داده‌ها',
@@ -23,6 +24,24 @@ export const fa: Messages = {
     digits: 'ارقام',
     nativeDigits: 'ارقام فارسی',
     latinDigits: 'ارقام لاتین',
+  },
+  table: {
+    rowsOf: 'ردیف {{first}} تا {{last}} از {{total}}',
+    page: '{{page}} از {{count}}',
+    previous: 'صفحهٔ قبل',
+    next: 'صفحهٔ بعد',
+  },
+  datasets: {
+    sample: 'نمونه',
+    imported: 'واردشده',
+    rows: '{{n}} ردیف',
+    importCsv: 'وارد کردن CSV',
+    importFailed: 'این فایل CSV خوانده نشد.',
+    tooLarge: 'حجم فایل بیشتر از ۵۰ مگابایت است.',
+    privacy: 'فایل‌های شما در همین مرورگر می‌مانند و هیچ چیزی آپلود نمی‌شود.',
+    fields: 'فیلدها',
+    preview: 'پیش‌نمایش',
+    useInDashboard: 'استفاده در داشبورد',
   },
   list: {
     title: 'داشبوردها',
