@@ -102,3 +102,17 @@ test('moves a widget on the grid and undoes the move', async ({ page }) => {
     .poll(async () => Math.round((await item.boundingBox())?.x ?? 0))
     .toBe(Math.round(before.x))
 })
+
+test('changes widget settings in the formweave form and undoes them', async ({ page }) => {
+  await newDashboard(page)
+  await page.getByTestId('palette-line').click()
+  const points = page.getByLabel('Show points')
+  await expect(points).toBeChecked()
+  await points.click()
+  await expect(points).not.toBeChecked()
+  await page.getByRole('heading', { name: /Settings/ }).click()
+  await page.keyboard.press('Control+z')
+  await expect(page.getByLabel('Show points')).toBeChecked()
+  await page.getByLabel('First color').selectOption('2')
+  await expect(page.getByLabel('First color')).toHaveValue('2')
+})
