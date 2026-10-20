@@ -41,6 +41,7 @@ pnpm data         # regenerate the sample Parquet files
 
 - `docs/brief.md`: the project brief
 - `docs/decisions.md`: decisions made during the build
+- `docs/build-log.md`: how the app was built, and a code walkthrough plan
 - `docs/deploy.md`: Nginx setup for the static site
 - `docs/mockups/`: approved design mockups
 
