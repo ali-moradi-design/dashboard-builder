@@ -1,7 +1,7 @@
 node_modules/
 dist/
 graphify-out/
-mockups/out/
+docs/mockups/out/
 test-results/
 playwright-report/
 .DS_Store

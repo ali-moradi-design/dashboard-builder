@@ -1,0 +1,457 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Dashboard builder mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --radius: 10px;
+  }
+  [data-theme='dark'] {
+    --bg: #2a2d2f;
+    --surface: #393d3f;
+    --surface-2: #43484a;
+    --border: #50565a;
+    --text: #fdfdff;
+    --muted: #c6c5b9;
+    --accent: #7fb0bc;
+    --accent-fg: #2a2d2f;
+    --accent-soft: rgba(127, 176, 188, 0.16);
+    --grid: #4a5054;
+    --s1: #7fb0bc; --s2: #c6c5b9; --s3: #8c9fb0; --s4: #d9e6e9; --s5: #5e98a6;
+  }
+  [data-theme='light'] {
+    --bg: #fdfdff;
+    --surface: #f4f4f1;
+    --surface-2: #e9e9e3;
+    --border: #d6d5cb;
+    --text: #393d3f;
+    --muted: #546a7b;
+    --accent: #3f6f7a;
+    --accent-fg: #fdfdff;
+    --accent-soft: rgba(98, 146, 158, 0.16);
+    --grid: #dddcd2;
+    --s1: #4a7f8b; --s2: #8a887a; --s3: #546a7b; --s4: #2f5963; --s5: #6f8d9c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  #root { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.45 Inter, system-ui, sans-serif;
+    width: 1440px;
+    height: 960px;
+    overflow: hidden;
+  }
+  [lang='fa'] body, [lang='fa'] { font-family: Vazirmatn, system-ui, sans-serif; }
+  .app { display: grid; grid-template-rows: 60px 1fr; height: 100%; }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding-inline: 20px;
+    border-block-end: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; }
+  .crumb { color: var(--muted); }
+  .crumb b { color: var(--text); font-weight: 600; }
+  .spacer { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 34px; padding-inline: 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text); font: inherit; font-weight: 500;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .btn.icon { width: 34px; padding: 0; justify-content: center; }
+  .btn.ghost { background: transparent; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg span { padding: 6px 10px; font-weight: 500; color: var(--muted); }
+  .seg span.on { background: var(--accent-soft); color: var(--text); }
+  svg.i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  main { display: grid; min-height: 0; }
+  .canvas { padding: 20px; overflow: hidden; min-width: 0; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 54px; gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; display: flex; flex-direction: column; min-width: 0; position: relative;
+  }
+  .card h3 { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .card h3 .more { margin-inline-start: auto; }
+  .kpi .v { font-size: 30px; font-weight: 700; margin-block-start: 6px; letter-spacing: -0.01em; }
+  [lang='fa'] .kpi .v { letter-spacing: 0; }
+  .kpi .d { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0 6px; align-items: center; white-space: nowrap; }
+  .up { color: var(--accent); font-weight: 600; }
+  .chart { flex: 1; min-height: 0; margin-block-start: 8px; }
+  .chart svg, svg.ch { width: 100%; height: 100%; display: block; direction: ltr; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 6px; vertical-align: -1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-block-start: 8px; }
+  th { text-align: start; color: var(--muted); font-weight: 500; padding: 7px 8px; border-block-end: 1px solid var(--border); }
+  td { padding: 7px 8px; border-block-end: 1px solid var(--grid); }
+  td.n, th.n { text-align: end; font-variant-numeric: tabular-nums; }
+  .filterbar { display: flex; align-items: center; gap: 10px; margin-block-end: 16px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; height: 34px; padding-inline: 12px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-weight: 500;
+  }
+  .chip small { color: var(--muted); font-weight: 400; }
+  .title-row { display: flex; align-items: baseline; gap: 12px; margin-block-end: 14px; }
+  .title-row h1 { margin: 0; font-size: 22px; }
+  .title-row p { margin: 0; color: var(--muted); }
+
+  /* edit mode */
+  .edit main { grid-template-columns: 220px 1fr 340px; }
+  aside { background: var(--surface); border-inline-end: 1px solid var(--border); padding: 16px; overflow: hidden; }
+  aside.end { border-inline-end: 0; border-inline-start: 1px solid var(--border); }
+  aside h4 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  [lang='fa'] aside h4 { text-transform: none; letter-spacing: 0; font-size: 13px; }
+  .pal { display: grid; gap: 8px; }
+  .pal div {
+    display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--bg); cursor: grab; font-weight: 500;
+  }
+  .pal div .grip { margin-inline-start: auto; color: var(--muted); }
+  .pal div.dragging { box-shadow: 0 10px 24px rgba(0,0,0,.25); transform: rotate(-2deg); border-color: var(--accent); }
+  .hint { font-size: 12px; color: var(--muted); margin-block-start: 12px; }
+  .edit .grid { background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: calc((100% + 16px) / 12) 86px; background-position: -8px -8px; border-radius: 8px; }
+  .edit .card { border-style: dashed; }
+  .edit .card.sel { border: 2px solid var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .handle { position: absolute; inset-block-end: 4px; inset-inline-end: 4px; width: 12px; height: 12px; border-inline-end: 2px solid var(--muted); border-block-end: 2px solid var(--muted); border-radius: 0 0 3px 0; }
+  [dir='rtl'] .handle { border-radius: 0 0 0 3px; }
+  .toolbar-mini { position: absolute; inset-block-start: -15px; inset-inline-end: 10px; display: flex; gap: 2px; background: var(--accent); color: var(--accent-fg); border-radius: 6px; padding: 3px; }
+  .toolbar-mini span { width: 24px; height: 22px; display: grid; place-items: center; }
+  .drop { border: 2px dashed var(--accent); background: var(--accent-soft); border-radius: var(--radius); display: grid; place-items: center; color: var(--text); font-weight: 500; }
+  .tabs { display: flex; gap: 4px; border-block-end: 1px solid var(--border); margin: -4px -16px 14px; padding-inline: 16px; }
+  .tabs span { padding: 8px 10px; color: var(--muted); font-weight: 500; border-block-end: 2px solid transparent; }
+  .tabs span.on { color: var(--text); border-color: var(--accent); }
+  .field { margin-block-end: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-block-end: 4px; font-weight: 500; }
+  .input { height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); padding-inline: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .swatches { display: flex; gap: 6px; }
+  .swatches i { width: 26px; height: 26px; border-radius: 6px; border: 2px solid transparent; }
+  .swatches i.on { border-color: var(--text); }
+  .toggle { display: flex; align-items: center; justify-content: space-between; padding-block: 6px; }
+  .sw { width: 34px; height: 20px; border-radius: 10px; background: var(--accent); position: relative; }
+  .sw::after { content: ''; position: absolute; inset-block-start: 3px; inset-inline-end: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent-fg); }
+  .sw.off { background: var(--border); }
+  .sw.off::after { inset-inline-end: auto; inset-inline-start: 3px; background: var(--bg); }
+  .kbd { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+
+  /* query builder */
+  .qb main { grid-template-columns: 260px 1fr; }
+  .fields .ds { margin-block-end: 14px; }
+  .fields .f { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: grab; }
+  .fields .f:hover, .fields .f.dragging { background: var(--bg); }
+  .fields .f.dragging { border: 1px solid var(--accent); box-shadow: 0 8px 18px rgba(0,0,0,.25); }
+  .type { width: 22px; height: 20px; border-radius: 4px; font-size: 10px; font-weight: 700; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); font-family: Inter, sans-serif; }
+  .qwrap { padding: 20px 24px; display: grid; grid-template-rows: auto auto 1fr; gap: 16px; min-height: 0; }
+  .sentence { font-size: 17px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .sentence b { color: var(--accent); font-weight: 600; }
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .zone { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+  .zone h5 { margin: 0 0 8px; font-size: 12px; color: var(--muted); font-weight: 600; display: flex; gap: 6px; align-items: center; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding-inline: 10px; border-radius: 7px; background: var(--accent-soft); border: 1px solid var(--accent); margin-inline-end: 6px; margin-block-end: 6px; font-weight: 500; }
+  .pill em { font-style: normal; color: var(--muted); font-weight: 400; }
+  .pill.add { background: transparent; border-style: dashed; border-color: var(--border); color: var(--muted); }
+  .pill.target { border-color: var(--accent); color: var(--text); background: transparent; border-style: dashed; border-width: 2px; }
+  .preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; min-height: 0; }
+  .preview .chart { margin: 0; }
+  .mini svg { width: 100%; height: 100%; display: block; }
+  .meta { font-size: 12px; color: var(--muted); display: flex; gap: 14px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const P = new URLSearchParams(location.search);
+const theme = P.get('theme') || 'dark';
+const lang = P.get('lang') || 'en';
+const view = P.get('view') || 'dashboard';
+const fa = lang === 'fa';
+document.documentElement.dataset.theme = theme;
+document.documentElement.lang = lang;
+document.documentElement.dir = fa ? 'rtl' : 'ltr';
+
+const nf = new Intl.NumberFormat(fa ? 'fa-IR' : 'en-US');
+const cf = new Intl.NumberFormat(fa ? 'fa-IR' : 'en-US', { notation: 'compact', maximumFractionDigits: 1 });
+const n = (x) => nf.format(x);
+const loc = fa ? 'fa-IR' : 'en-US';
+const eur = (x) => new Intl.NumberFormat(loc, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(x);
+const eurC = (x) => new Intl.NumberFormat(loc, { style: 'currency', currency: 'EUR', notation: 'compact', maximumFractionDigits: 1 }).format(x);
+const pct = (x, sign) => new Intl.NumberFormat(loc, { style: 'percent', maximumFractionDigits: 1, signDisplay: sign ? 'always' : 'auto' }).format(x / 100);
+const d = (s) => (fa ? String(s).replace(/[0-9]/g, (c) => '۰۱۲۳۴۵۶۷۸۹'[c]) : s);
+
+const T = {
+  en: {
+    app: 'Dashboards', dash: 'Sales overview', sub: 'Sample dataset · Superstore orders',
+    edit: 'Edit', done: 'Done', share: 'Export', range: 'Date range', rangeV: 'Jan 1 – Dec 31, 2025',
+    revenue: 'Revenue', orders: 'Orders', aov: 'Avg. order value', margin: 'Profit margin',
+    vsPrev: 'vs. previous period', byMonth: 'Revenue by month', byCountry: 'Revenue by country',
+    byCat: 'Share by category', top: 'Top products',
+    product: 'Product', cat: 'Category', qty: 'Qty', rev: 'Revenue',
+    months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    countries: ['Germany','France','Spain','Italy','Netherlands','Austria'],
+    cats: ['Technology','Furniture','Office supplies','Accessories'],
+    prods: [['Standing desk','Furniture',412,'186,420'],['Noise-cancel headset','Technology',980,'147,000'],['Ergonomic chair','Furniture',377,'131,950'],['4K monitor 27″','Technology',301,'105,350'],['Desk lamp','Accessories',1204,'48,160']],
+    widgets: 'Widgets', kpi: 'KPI card', line: 'Line chart', bar: 'Bar chart', pie: 'Pie / donut', table: 'Table',
+    dragHint: 'Drag a widget onto the grid. Drag edges to resize.', dropHere: 'Drop to add a bar chart',
+    undo: 'Undo', redo: 'Redo', settings: 'Widget settings', tQuery: 'Query', tDisplay: 'Display', tFormat: 'Format',
+    title: 'Title', xAxis: 'X axis', yAxis: 'Y axis', xV: 'Order date (month)', yV: 'Sum of revenue',
+    color: 'Series color', numFmt: 'Number format', numV: 'Currency (€), compact', legend: 'Show legend', labels: 'Data labels', smooth: 'Smooth line', area: 'Fill area',
+    editQuery: 'Edit query', save: 'Save',
+    qbTitle: 'Query builder', back: 'Back to dashboard', datasets: 'Dataset', fieldsT: 'Fields',
+    ds1: 'Superstore orders', ds2: 'City weather', search: 'Search fields…',
+    fOrderDate: 'Order date', fCountry: 'Country', fCategory: 'Category', fProduct: 'Product', fRevenue: 'Revenue', fQty: 'Quantity', fProfit: 'Profit', fDiscount: 'Discount',
+    sent: ['Show ', 'sum of revenue', ' and ', 'count of orders', ' by ', 'month', ', where ', 'country is Germany', ', newest first.'],
+    measures: 'Measures', groupBy: 'Group by', filters: 'Filters (all must match)', sortLimit: 'Sort & limit',
+    sum: 'Sum', count: 'Count', of: 'of', byMonthP: 'by month', is: 'is', ge: '≥',
+    sortV: 'Order date ↓', limitV: 'Limit 100', addMeasure: 'Add measure', addGroup: 'Drop a second field', addFilter: 'Add filter',
+    preview: 'Preview', rows: '12 rows', ms: '38 ms', cached: 'cached', apply: 'Apply to widget', month: 'Month',
+  },
+  fa: {
+    app: 'داشبوردها', dash: 'نمای کلی فروش', sub: 'دادهٔ نمونه · سفارش‌های فروشگاه',
+    edit: 'ویرایش', done: 'پایان', share: 'خروجی', range: 'بازهٔ تاریخ', rangeV: '1 Jan – 31 Dec 2025',
+    revenue: 'درآمد', orders: 'سفارش‌ها', aov: 'میانگین سفارش', margin: 'حاشیهٔ سود',
+    vsPrev: 'نسبت به دورهٔ قبل', byMonth: 'درآمد ماهانه', byCountry: 'درآمد بر اساس کشور',
+    byCat: 'سهم هر دسته', top: 'پرفروش‌ترین محصولات',
+    product: 'محصول', cat: 'دسته', qty: 'تعداد', rev: 'درآمد',
+    months: ['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'],
+    countries: ['آلمان','فرانسه','اسپانیا','ایتالیا','هلند','اتریش'],
+    cats: ['فناوری','مبلمان','لوازم اداری','لوازم جانبی'],
+    prods: [['میز ایستاده','مبلمان',412,'186,420'],['هدست حذف نویز','فناوری',980,'147,000'],['صندلی ارگونومیک','مبلمان',377,'131,950'],['مانیتور ۲۷ اینچ','فناوری',301,'105,350'],['چراغ مطالعه','لوازم جانبی',1204,'48,160']],
+    widgets: 'ویجت‌ها', kpi: 'کارت شاخص', line: 'نمودار خطی', bar: 'نمودار میله‌ای', pie: 'نمودار دایره‌ای', table: 'جدول',
+    dragHint: 'ویجت را روی شبکه بکشید. برای تغییر اندازه، لبه‌ها را بکشید.', dropHere: 'رها کنید تا نمودار میله‌ای اضافه شود',
+    undo: 'واگرد', redo: 'ازنو', settings: 'تنظیمات ویجت', tQuery: 'پرس‌وجو', tDisplay: 'نمایش', tFormat: 'قالب',
+    title: 'عنوان', xAxis: 'محور افقی', yAxis: 'محور عمودی', xV: 'تاریخ سفارش (ماه)', yV: 'جمع درآمد',
+    color: 'رنگ سری', numFmt: 'قالب عدد', numV: 'ارز (€)، فشرده', legend: 'نمایش راهنما', labels: 'برچسب داده', smooth: 'خط نرم', area: 'پر کردن زیر خط',
+    editQuery: 'ویرایش پرس‌وجو', save: 'ذخیره',
+    qbTitle: 'سازندهٔ پرس‌وجو', back: 'بازگشت به داشبورد', datasets: 'مجموعه‌داده', fieldsT: 'فیلدها',
+    ds1: 'سفارش‌های فروشگاه', ds2: 'آب‌وهوای شهرها', search: 'جست‌وجوی فیلد…',
+    fOrderDate: 'تاریخ سفارش', fCountry: 'کشور', fCategory: 'دسته', fProduct: 'محصول', fRevenue: 'درآمد', fQty: 'تعداد', fProfit: 'سود', fDiscount: 'تخفیف',
+    sent: ['نمایش ', 'جمع درآمد', ' و ', 'تعداد سفارش‌ها', ' به تفکیک ', 'ماه', '، فقط ', 'کشور آلمان', '، جدیدترین اول.'],
+    measures: 'سنجه‌ها', groupBy: 'گروه‌بندی', filters: 'فیلترها (همه باید برقرار باشند)', sortLimit: 'مرتب‌سازی و محدودیت',
+    sum: 'جمع', count: 'تعداد', of: '', byMonthP: 'به تفکیک ماه', is: 'برابر', ge: '≥',
+    sortV: 'تاریخ سفارش ↓', limitV: 'حداکثر ۱۰۰', addMeasure: 'افزودن سنجه', addGroup: 'فیلد دوم را اینجا رها کنید', addFilter: 'افزودن فیلتر',
+    preview: 'پیش‌نمایش', rows: '۱۲ ردیف', ms: '۳۸ میلی‌ثانیه', cached: 'از حافظه', apply: 'اعمال روی ویجت', month: 'ماه',
+  },
+}[lang];
+
+// Gregorian date range rendered with Intl so Persian gets native digits and month names.
+if (fa) {
+  const df = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'short', year: 'numeric' });
+  T.rangeV = df.format(new Date(2025, 0, 1)) + ' – ' + df.format(new Date(2025, 11, 31));
+}
+
+const ic = {
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  dl: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  more: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo: '<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  kpi: '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>',
+  line: '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
+  bar: '<path d="M3 3v18h18"/><path d="M8 17V9M13 17V5M18 17v-3"/>',
+  pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+  table: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+  grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
+  db: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  filter: '<path d="M22 3H2l8 9.5V19l4 2v-8.5Z"/>',
+  sigma: '<path d="M18 7V4H6l6 8-6 8h12v-3"/>',
+  layers: '<path d="m12 2 10 5-10 5L2 7Z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
+  sort: '<path d="m3 16 4 4 4-4M7 20V4M21 8l-4-4-4 4M17 4v16"/>',
+  arrow: fa ? '<path d="m12 19 7-7-7-7M19 12H5"/>' : '<path d="m12 19-7-7 7-7M19 12H5"/>',
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+};
+const charts = [];
+const C = (fn, cls = 'chart', style = '') => `<div class="${cls}" style="${style}" data-c="${charts.push(fn) - 1}"></div>`;
+const I = (k) => `<svg class="i" viewBox="0 0 24 24">${ic[k]}</svg>`;
+
+const revenue = [62, 58, 71, 69, 78, 84, 80, 88, 95, 91, 104, 118];
+const prev = [55, 54, 60, 63, 66, 70, 72, 74, 79, 82, 88, 96];
+
+function lineChart(w, h, series, labels, opt = {}) {
+  const yw = opt.small ? 0 : fa ? 52 : 44;
+  const pad = fa ? { t: 10, r: yw, b: opt.small ? 4 : 24, l: 10 } : { t: 10, r: 10, b: opt.small ? 4 : 24, l: yw };
+  const max = 140, iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const X = (i) => {
+    const x = (i / (labels.length - 1)) * iw;
+    return fa ? pad.l + iw - x : pad.l + x; // RTL: time flows right-to-left
+  };
+  const Y = (v) => pad.t + ih - (v / max) * ih;
+  let s = '';
+  for (let g = 0; g <= 4 && !opt.small; g++) {
+    const v = (max / 4) * g, y = Y(v);
+    s += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${y}" y2="${y}" stroke="var(--grid)"/>`;
+    s += `<text x="${fa ? w - 2 : pad.l - 8}" y="${y + 4}" font-size="11" fill="var(--muted)" text-anchor="end">${cf.format(v * 1000)}</text>`;
+  }
+  labels.forEach((m, i) => { if (i % (opt.every || 1) === 0) s += `<text x="${X(i)}" y="${h - 6}" font-size="11" fill="var(--muted)" text-anchor="middle">${m}</text>`; });
+  series.forEach((ser, k) => {
+    const pts = ser.data.map((v, i) => `${X(i)},${Y(v)}`).join(' ');
+    if (opt.area && k === 0) s += `<polygon points="${X(0)},${Y(0)} ${pts} ${X(ser.data.length - 1)},${Y(0)}" fill="${ser.c}" opacity=".14"/>`;
+    s += `<polyline points="${pts}" fill="none" stroke="${ser.c}" stroke-width="${k ? 2 : 2.5}" ${ser.dash ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round"/>`;
+    if (!ser.dash) ser.data.forEach((v, i) => (s += `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="var(--surface)" stroke="${ser.c}" stroke-width="2"/>`));
+  });
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
+}
+
+function barChart(w, h, vals, labels) {
+  const pad = { t: 6, b: 6 }, lw = fa ? 70 : 84, max = 400, vw = fa ? 96 : 56;
+  const bh = (h - pad.t - pad.b) / vals.length;
+  let s = '';
+  vals.forEach((v, i) => {
+    const y = pad.t + i * bh, bw = ((w - lw - vw) * v) / max;
+    const x0 = fa ? w - lw : lw;
+    const bx = fa ? x0 - bw : x0;
+    s += `<text x="${fa ? w : lw - 10}" y="${y + bh / 2 + 4}" font-size="12" fill="var(--muted)" text-anchor="end">${labels[i]}</text>`;
+    s += `<rect x="${bx}" y="${y + bh * 0.18}" width="${bw}" height="${bh * 0.64}" rx="4" fill="var(--s${i === 0 ? 1 : 3})"/>`;
+    s += `<text x="${fa ? bx - 8 : bx + bw + 8}" y="${y + bh / 2 + 4}" font-size="12" fill="var(--text)" text-anchor="${fa ? 'end' : 'start'}">${cf.format(v * 1000)}</text>`;
+  });
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
+}
+
+function donut(size, vals) {
+  const r = size / 2 - 8, c = size / 2, tot = vals.reduce((a, b) => a + b, 0);
+  let a0 = -Math.PI / 2, s = '';
+  vals.forEach((v, i) => {
+    const a1 = a0 + (v / tot) * Math.PI * 2 * (fa ? -1 : 1);
+    const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0, sweep = fa ? 0 : 1;
+    const p = (a) => `${c + r * Math.cos(a)},${c + r * Math.sin(a)}`;
+    s += `<path d="M${p(a0)} A${r},${r} 0 ${large} ${sweep} ${p(a1)}" fill="none" stroke="var(--s${i + 1})" stroke-width="22"/>`;
+    a0 = a1;
+  });
+  s += `<text x="${c}" y="${c - 2}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${eurC(998000)}</text>`;
+  s += `<text x="${c}" y="${c + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${T.revenue}</text>`;
+  return `<svg viewBox="0 0 ${size} ${size}" style="width:${size}px;height:${size}px;flex:none">${s}</svg>`;
+}
+
+const cats = [38, 29, 21, 12];
+const legend = (items) => `<div class="legend">${items.map((t, i) => `<span><i style="background:var(--s${i + 1})"></i>${t}</span>`).join('')}</div>`;
+
+function header(mode) {
+  const themeSeg = `<div class="seg"><span class="${theme === 'light' ? 'on' : ''}">${I('sun')}</span><span class="${theme === 'dark' ? 'on' : ''}">${I('moon')}</span></div>`;
+  const langSeg = `<div class="seg"><span class="${!fa ? 'on' : ''}">EN</span><span class="${fa ? 'on' : ''}">فا</span></div>`;
+  let right = '';
+  if (mode === 'view') right = `<button class="btn">${I('dl')}${T.share}</button><button class="btn primary">${I('edit')}${T.edit}</button>`;
+  if (mode === 'edit') right = `<button class="btn icon" title="${T.undo}">${I('undo')}</button><button class="btn icon" title="${T.redo}">${I('redo')}</button><span class="kbd">${fa ? 'Ctrl+Z' : 'Ctrl+Z'}</span><button class="btn primary">${T.done}</button>`;
+  if (mode === 'qb') right = `<button class="btn">${I('arrow')}${T.back}</button><button class="btn primary">${T.apply}</button>`;
+  const crumb = mode === 'qb' ? `${T.app} / ${T.dash} / <b>${T.qbTitle}</b>` : `${T.app} / <b>${T.dash}</b>`;
+  return `<header><div class="logo"><i>${I('grid').replace('class="i"', 'class="i" style="color:var(--accent-fg)"')}</i></div><div class="crumb">${crumb}</div><div class="spacer"></div>${langSeg}${themeSeg}${right}</header>`;
+}
+
+const kpis = [
+  [T.revenue, eurC(998400), pct(12.4, 1)],
+  [T.orders, n(8412), pct(6.1, 1)],
+  [T.aov, new Intl.NumberFormat(loc, { style: 'currency', currency: 'EUR' }).format(118.7), pct(5.9, 1)],
+  [T.margin, pct(14.2), (fa ? '+' + n(1.3) + ' واحد' : '+1.3 pts')],
+];
+
+function kpiCard([t, v, delta], extra = '') {
+  return `<div class="card kpi" style="grid-column:span 3;grid-row:span 2">${extra}<h3>${t}</h3><div class="v">${v}</div><div class="d"><span class="up">▲ ${delta}</span>${T.vsPrev}</div></div>`;
+}
+
+function dashboardGrid(edit) {
+  const months = fa ? T.months.map((m) => m.slice(0, 4)) : T.months;
+  const sel = edit ? '<div class="toolbar-mini"><span>' + I('copy') + '</span><span>' + I('trash') + '</span></div>' : '';
+  const handle = edit ? '<div class="handle"></div>' : '';
+  const more = edit ? '' : `<span class="more" style="color:var(--muted)">${I('more')}</span>`;
+  let g = kpis.map((k) => kpiCard(k, handle)).join('');
+  g += `<div class="card ${edit ? 'sel' : ''}" style="grid-column:span ${edit ? 12 : 8};grid-row:span 4">${sel}${handle}<h3>${T.byMonth}${more}</h3>${legend(['2025', '2024'])}${C((w, h) => lineChart(w, h, [{ data: revenue, c: 'var(--s1)' }, { data: prev, c: 'var(--s3)', dash: true }], months, { area: true }))}</div>`;
+  if (!edit) {
+    g += `<div class="card" style="grid-column:span 4;grid-row:span 4"><h3>${T.byCategory || T.byCat}${more}</h3><div style="display:flex;align-items:center;gap:16px;flex:1">${donut(170, cats)}<div style="display:grid;gap:8px;font-size:13px">${T.cats.map((t, i) => `<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--s${i + 1});margin-inline-end:8px"></i>${t} <b style="margin-inline-start:6px">${pct(cats[i])}</b></span>`).join('')}</div></div></div>`;
+    g += `<div class="card" style="grid-column:span 5;grid-row:span 4"><h3>${T.byCountry}${more}</h3>${C((w, h) => barChart(w, h, [312, 241, 168, 131, 88, 58], T.countries))}</div>`;
+    g += `<div class="card" style="grid-column:span 7;grid-row:span 4"><h3>${T.top}${more}</h3><table><thead><tr><th>${T.product}</th><th>${T.cat}</th><th class="n">${T.qty}</th><th class="n">${T.rev}</th></tr></thead><tbody>${T.prods.map((p) => `<tr><td>${p[0]}</td><td style="color:var(--muted)">${p[1]}</td><td class="n">${n(p[2])}</td><td class="n">${eur(+p[3].replace(',', ''))}</td></tr>`).join('')}</tbody></table></div>`;
+  } else {
+    g += `<div class="card" style="grid-column:span 6;grid-row:span 3">${handle}<h3>${T.byCountry}</h3>${C((w, h) => barChart(w, h, [312, 241, 168, 131], T.countries.slice(0, 4)))}</div>`;
+    g += `<div class="drop" style="grid-column:span 6;grid-row:span 3"><span>${I('plus')} ${T.dropHere}</span></div>`;
+  }
+  return `<div class="grid">${g}</div>`;
+}
+
+function viewDashboard() {
+  return `<div class="app">${header('view')}<main><div class="canvas">
+    <div class="title-row"><h1>${T.dash}</h1><p>${T.sub}</p></div>
+    <div class="filterbar"><span class="chip">${I('cal')}<small>${T.range}</small>${T.rangeV}${I('down')}</span></div>
+    ${dashboardGrid(false)}</div></main></div>`;
+}
+
+function viewEdit() {
+  const pal = [['kpi', T.kpi], ['line', T.line], ['bar', T.bar], ['pie', T.pie], ['table', T.table]];
+  const months = fa ? T.months.map((m) => m.slice(0, 4)) : T.months;
+  return `<div class="app edit">${header('edit')}<main>
+    <aside><h4>${T.widgets}</h4><div class="pal">${pal.map(([k, t]) => `<div class="${k === 'bar' ? 'dragging' : ''}">${I(k)}${t}<span class="grip">${I('grip')}</span></div>`).join('')}</div><p class="hint">${T.dragHint}</p></aside>
+    <div class="canvas"><div class="filterbar"><span class="chip">${I('cal')}<small>${T.range}</small>${T.rangeV}${I('down')}</span></div>${dashboardGrid(true)}</div>
+    <aside class="end">
+      <h4>${T.settings}</h4>
+      <div class="tabs"><span>${T.tQuery}</span><span class="on">${T.tDisplay}</span><span>${T.tFormat}</span></div>
+      <div class="field"><label>${T.title}</label><div class="input">${T.byMonth}</div></div>
+      <div class="row2"><div class="field"><label>${T.xAxis}</label><div class="input"><span>${T.xV}</span>${I('down')}</div></div>
+      <div class="field"><label>${T.yAxis}</label><div class="input"><span>${T.yV}</span>${I('down')}</div></div></div>
+      <div class="field"><label>${T.color}</label><div class="swatches">${[1, 2, 3, 4, 5].map((i) => `<i class="${i === 1 ? 'on' : ''}" style="background:var(--s${i})"></i>`).join('')}</div></div>
+      <div class="field"><label>${T.numFmt}</label><div class="input"><span>${T.numV}</span>${I('down')}</div></div>
+      <div class="toggle"><span>${T.legend}</span><span class="sw"></span></div>
+      <div class="toggle"><span>${T.smooth}</span><span class="sw off"></span></div>
+      <div class="toggle"><span>${T.area}</span><span class="sw"></span></div>
+      <div class="toggle"><span>${T.labels}</span><span class="sw off"></span></div>
+      <div style="display:flex;gap:8px;margin-block-start:14px"><button class="btn" style="flex:1;justify-content:center">${I('sigma')}${T.editQuery}</button></div>
+      <div class="field" style="margin-block-start:16px"><label>${T.tDisplay} · ${T.line}</label>${C((w, h) => lineChart(w, h, [{ data: revenue, c: 'var(--s1)' }], months.map(() => ''), { area: true, small: true }), 'mini', 'height:90px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px')}</div>
+    </aside>
+  </main></div>`;
+}
+
+function viewQB() {
+  const F = [['D', T.fOrderDate], ['A', T.fCountry], ['A', T.fCategory], ['A', T.fProduct], ['#', T.fRevenue], ['#', T.fQty], ['#', T.fProfit], ['%', T.fDiscount]];
+  const s = T.sent;
+  const months = fa ? T.months.map((m) => m.slice(0, 4)) : T.months;
+  const de = [21, 19, 24, 23, 26, 28, 27, 29, 31, 30, 34, 39];
+  const rows = [11, 10, 9, 8, 7].map((i) => `<tr><td>${T.months[i]} ${d(2025)}</td><td class="n">${eur(de[i] * 1000 + 412)}</td><td class="n">${n(Math.round(de[i] * 8.4))}</td></tr>`).join('');
+  return `<div class="app qb">${header('qb')}<main>
+    <aside class="fields">
+      <h4>${T.datasets}</h4>
+      <div class="input ds"><span style="display:flex;gap:8px;align-items:center">${I('db')}${T.ds1}</span>${I('down')}</div>
+      <div class="input ds" style="color:var(--muted)"><span style="display:flex;gap:8px;align-items:center">${I('search')}${T.search}</span></div>
+      <h4>${T.fieldsT}</h4>
+      ${F.map(([t, l]) => `<div class="f ${l === T.fCategory ? 'dragging' : ''}"><span class="type">${t}</span>${l}<span style="margin-inline-start:auto;color:var(--muted)">${I('grip')}</span></div>`).join('')}
+      <button class="btn" style="margin-block-start:14px;width:100%;justify-content:center">${I('upload')}CSV</button>
+    </aside>
+    <div class="qwrap">
+      <div class="sentence">${s[0]}<b>${s[1]}</b>${s[2]}<b>${s[3]}</b>${s[4]}<b>${s[5]}</b>${s[6]}<b>${s[7]}</b>${s[8]}</div>
+      <div class="zones">
+        <div class="zone"><h5>${I('sigma')}${T.measures}</h5><span class="pill">${T.sum} ${T.of} ${T.fRevenue}${I('down')}${I('x')}</span><span class="pill">${T.count} ${T.of} ${T.orders}${I('down')}${I('x')}</span><span class="pill add">${I('plus')}${T.addMeasure}</span></div>
+        <div class="zone"><h5>${I('layers')}${T.groupBy}</h5><span class="pill">${T.fOrderDate} <em>${T.byMonthP}</em>${I('down')}${I('x')}</span><span class="pill target">${I('plus')}${T.addGroup}</span></div>
+        <div class="zone"><h5>${I('filter')}${T.filters}</h5><span class="pill">${T.fCountry} <em>${T.is}</em> ${T.countries[0]}${I('x')}</span><span class="pill add">${I('plus')}${T.addFilter}</span></div>
+        <div class="zone"><h5>${I('sort')}${T.sortLimit}</h5><span class="pill">${T.sortV}${I('down')}</span><span class="pill">${T.limitV}${I('down')}</span></div>
+      </div>
+      <div class="preview">
+        <div style="display:flex;flex-direction:column;min-height:0"><div style="display:flex;justify-content:space-between;align-items:center"><b>${T.preview}</b><span class="meta"><span>${T.rows}</span><span>${T.ms}</span><span>${T.cached}</span></span></div>${C((w, h) => lineChart(w, h, [{ data: de.map((v) => v * 3.2), c: 'var(--s1)' }], months, { area: true }))}</div>
+        <div><table><thead><tr><th>${T.month}</th><th class="n">${T.fRevenue}</th><th class="n">${T.orders}</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div>
+    </div>
+  </main></div>`;
+}
+
+document.getElementById('root').innerHTML = view === 'edit' ? viewEdit() : view === 'query' ? viewQB() : viewDashboard();
+document.querySelectorAll('[data-c]').forEach((el) => {
+  const r = el.getBoundingClientRect();
+  const cs = getComputedStyle(el);
+  const w = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const h = r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  el.innerHTML = charts[el.dataset.c](Math.floor(w), Math.floor(h));
+});
+</script>
+</body>
+</html>
