@@ -10,13 +10,9 @@ export function HeadingWidget({ widget, settings: s }: RendererProps<'heading'>)
         s.align === 'center' && 'items-center text-center',
       )}
     >
-      <h2 dir="auto" className="text-lg leading-tight font-bold">
-        {widget.title}
-      </h2>
+      <h2 className="text-lg leading-tight font-bold [unicode-bidi:plaintext]">{widget.title}</h2>
       {s.subtitle && (
-        <p dir="auto" className="text-[13px] text-muted">
-          {s.subtitle}
-        </p>
+        <p className="text-[13px] text-muted [unicode-bidi:plaintext]">{s.subtitle}</p>
       )}
     </div>
   )

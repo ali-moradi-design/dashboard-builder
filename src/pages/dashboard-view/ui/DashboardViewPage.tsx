@@ -49,13 +49,9 @@ export function DashboardViewPage() {
       />
       <main className="p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 dir="auto" className="text-2xl font-bold">
-            {dashboard.title}
-          </h1>
+          <h1 className="text-2xl font-bold [unicode-bidi:plaintext]">{dashboard.title}</h1>
           {dashboard.description && (
-            <p dir="auto" className="text-muted">
-              {dashboard.description}
-            </p>
+            <p className="text-muted [unicode-bidi:plaintext]">{dashboard.description}</p>
           )}
         </div>
         <div className="mb-4">
