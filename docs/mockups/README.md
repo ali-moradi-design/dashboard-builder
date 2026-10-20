@@ -1,6 +1,6 @@
 # Mockups
 
-Static design mockups for approval before app code: dashboard view (all nine
+Static design mockups for approval before app code: dashboard view (all eleven
 widget types), edit mode
 with the widget settings panel, and the query builder, in dark and light,
 English and Persian. Charts are hand-drawn SVG, not ECharts.
