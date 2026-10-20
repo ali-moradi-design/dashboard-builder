@@ -37,17 +37,18 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
+  html { background: var(--bg); }
   #root { height: 100%; }
   body {
     background: var(--bg);
     color: var(--text);
     font: 14px/1.45 Inter, system-ui, sans-serif;
     width: 1440px;
-    height: 960px;
+    min-height: 960px;
     overflow: hidden;
   }
   [lang='fa'] body, [lang='fa'] { font-family: Vazirmatn, system-ui, sans-serif; }
-  .app { display: grid; grid-template-rows: 60px 1fr; height: 100%; }
+  .app { display: grid; grid-template-rows: 60px 1fr; min-height: 960px; }
   header {
     display: flex; align-items: center; gap: 12px;
     padding-inline: 20px;
@@ -144,12 +145,13 @@
 
   /* query builder */
   .qb main { grid-template-columns: 260px 1fr; }
+  body:has(.qb), .app.qb { min-height: 0; }
   .fields .ds { margin-block-end: 14px; }
   .fields .f { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: grab; }
   .fields .f:hover, .fields .f.dragging { background: var(--bg); }
   .fields .f.dragging { border: 1px solid var(--accent); box-shadow: 0 8px 18px rgba(0,0,0,.25); }
   .type { width: 22px; height: 20px; border-radius: 4px; font-size: 10px; font-weight: 700; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); font-family: Inter, sans-serif; }
-  .qwrap { padding: 20px 24px; display: grid; grid-template-rows: auto auto 1fr; gap: 16px; min-height: 0; }
+  .qwrap { padding: 20px 24px; display: grid; grid-template-rows: auto auto auto; align-content: start; gap: 16px; min-height: 0; }
   .sentence { font-size: 17px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
   .sentence b { color: var(--accent); font-weight: 600; }
   .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -159,8 +161,23 @@
   .pill em { font-style: normal; color: var(--muted); font-weight: 400; }
   .pill.add { background: transparent; border-style: dashed; border-color: var(--border); color: var(--muted); }
   .pill.target { border-color: var(--accent); color: var(--text); background: transparent; border-style: dashed; border-width: 2px; }
-  .preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; min-height: 0; }
+  .preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; height: 420px; }
   .preview .chart { margin: 0; }
+  .tcard { display: flex; flex-direction: column; min-height: 0; }
+  th .s { display: inline-flex; vertical-align: -3px; margin-inline-start: 4px; opacity: .45; }
+  th.sorted { color: var(--text); }
+  th.sorted .s { opacity: 1; color: var(--accent); }
+  .tfoot { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); margin-block-start: auto; padding-block-start: 10px; }
+  .pg { display: flex; gap: 4px; align-items: center; }
+  .pg span { min-width: 26px; height: 26px; padding-inline: 4px; border: 1px solid var(--border); border-radius: 6px; display: inline-grid; place-items: center; color: var(--text); background: var(--bg); }
+  .pg span.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .pg span.dis { opacity: .45; }
+  .showas { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-block: 10px 4px; font-size: 12px; color: var(--muted); }
+  .showas span.t { display: inline-grid; place-items: center; width: 30px; height: 28px; border: 1px solid var(--border); border-radius: 6px; color: var(--text); background: var(--bg); }
+  .showas span.t.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .donut-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; height: 100%; }
+  .donut-leg { display: grid; gap: 8px; font-size: 13px; }
+  .donut-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 8px; }
   .mini svg { width: 100%; height: 100%; display: block; }
   .meta { font-size: 12px; color: var(--muted); display: flex; gap: 14px; }
 </style>
@@ -198,6 +215,9 @@ const T = {
     countries: ['Germany','France','Spain','Italy','Netherlands','Austria'],
     cats: ['Technology','Furniture','Office supplies','Accessories'],
     prods: [['Standing desk','Furniture',412,'186,420'],['Noise-cancel headset','Technology',980,'147,000'],['Ergonomic chair','Furniture',377,'131,950'],['4K monitor 27″','Technology',301,'105,350'],['Desk lamp','Accessories',1204,'48,160']],
+    areaChart: 'Area chart', stacked: 'Stacked bar', scatter: 'Scatter plot', heatmap: 'Heatmap',
+    byCatQ: 'Revenue by category per quarter', heatT: 'Orders by weekday and hour', scatterT: 'Discount vs. profit per order', areaT: 'Cumulative profit',
+    showAs: 'Show as', rowsOf: (a, b, c) => `Rows ${a}–${b} of ${c}`, perPage: '5 per page', quarters: ['Q1', 'Q2', 'Q3', 'Q4'], discount: 'Discount', profit: 'Profit',
     widgets: 'Widgets', kpi: 'KPI card', line: 'Line chart', bar: 'Bar chart', pie: 'Pie / donut', table: 'Table',
     dragHint: 'Drag a widget onto the grid. Drag edges to resize.', dropHere: 'Drop to add a bar chart',
     undo: 'Undo', redo: 'Redo', settings: 'Widget settings', tQuery: 'Query', tDisplay: 'Display', tFormat: 'Format',
@@ -224,6 +244,9 @@ const T = {
     countries: ['آلمان','فرانسه','اسپانیا','ایتالیا','هلند','اتریش'],
     cats: ['فناوری','مبلمان','لوازم اداری','لوازم جانبی'],
     prods: [['میز ایستاده','مبلمان',412,'186,420'],['هدست حذف نویز','فناوری',980,'147,000'],['صندلی ارگونومیک','مبلمان',377,'131,950'],['مانیتور ۲۷ اینچ','فناوری',301,'105,350'],['چراغ مطالعه','لوازم جانبی',1204,'48,160']],
+    areaChart: 'نمودار ناحیه‌ای', stacked: 'میله‌ای انباشته', scatter: 'نمودار پراکندگی', heatmap: 'نقشهٔ حرارتی',
+    byCatQ: 'درآمد هر دسته در هر فصل', heatT: 'سفارش‌ها بر اساس روز و ساعت', scatterT: 'تخفیف در برابر سود هر سفارش', areaT: 'سود تجمعی',
+    showAs: 'نمایش به‌صورت', rowsOf: (a, b, c) => `ردیف ${a} تا ${b} از ${c}`, perPage: '۵ در هر صفحه', quarters: ['فصل ۱', 'فصل ۲', 'فصل ۳', 'فصل ۴'], discount: 'تخفیف', profit: 'سود',
     widgets: 'ویجت‌ها', kpi: 'کارت شاخص', line: 'نمودار خطی', bar: 'نمودار میله‌ای', pie: 'نمودار دایره‌ای', table: 'جدول',
     dragHint: 'ویجت را روی شبکه بکشید. برای تغییر اندازه، لبه‌ها را بکشید.', dropHere: 'رها کنید تا نمودار میله‌ای اضافه شود',
     undo: 'واگرد', redo: 'ازنو', settings: 'تنظیمات ویجت', tQuery: 'پرس‌وجو', tDisplay: 'نمایش', tFormat: 'قالب',
@@ -256,13 +279,22 @@ const ic = {
   moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   dl: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
   more: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
-  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
-  redo: '<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  // Undo/redo arrows are mirrored in RTL.
+  [fa ? 'redo' : 'undo']: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  [fa ? 'undo' : 'redo']: '<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
   kpi: '<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>',
   line: '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
   bar: '<path d="M3 3v18h18"/><path d="M8 17V9M13 17V5M18 17v-3"/>',
   pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
   table: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+  area: '<path d="M3 3v18h18"/><path d="M7 17v-3l4-4 4 3 5-5v9Z"/>',
+  stack: '<path d="M3 3v18h18"/><path d="M7 18V8h4v10M14 18v-7h4v7M7 13h4M14 15h4"/>',
+  scatter: '<path d="M3 3v18h18"/><circle cx="8" cy="15" r="1.5"/><circle cx="12" cy="10" r="1.5"/><circle cx="16" cy="13" r="1.5"/><circle cx="18" cy="6" r="1.5"/>',
+  heat: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+  chevS: fa ? '<path d="m9 18 6-6-6-6"/>' : '<path d="m15 18-6-6 6-6"/>',
+  chevE: fa ? '<path d="m15 18-6-6 6-6"/>' : '<path d="m9 18 6-6-6-6"/>',
+  sortD: '<path d="M12 5v14M19 12l-7 7-7-7"/>',
+  sortN: '<path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>',
   grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
   db: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
@@ -287,7 +319,7 @@ const prev = [55, 54, 60, 63, 66, 70, 72, 74, 79, 82, 88, 96];
 function lineChart(w, h, series, labels, opt = {}) {
   const yw = opt.small ? 0 : fa ? 52 : 44;
   const pad = fa ? { t: 10, r: yw, b: opt.small ? 4 : 24, l: 10 } : { t: 10, r: 10, b: opt.small ? 4 : 24, l: yw };
-  const max = 140, iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const max = opt.max || 140, iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
   const X = (i) => {
     const x = (i / (labels.length - 1)) * iw;
     return fa ? pad.l + iw - x : pad.l + x; // RTL: time flows right-to-left
@@ -304,7 +336,7 @@ function lineChart(w, h, series, labels, opt = {}) {
     const pts = ser.data.map((v, i) => `${X(i)},${Y(v)}`).join(' ');
     if (opt.area && k === 0) s += `<polygon points="${X(0)},${Y(0)} ${pts} ${X(ser.data.length - 1)},${Y(0)}" fill="${ser.c}" opacity=".14"/>`;
     s += `<polyline points="${pts}" fill="none" stroke="${ser.c}" stroke-width="${k ? 2 : 2.5}" ${ser.dash ? 'stroke-dasharray="5 4"' : ''} stroke-linejoin="round"/>`;
-    if (!ser.dash) ser.data.forEach((v, i) => (s += `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="var(--surface)" stroke="${ser.c}" stroke-width="2"/>`));
+    if (!ser.dash && !opt.noDots) ser.data.forEach((v, i) => (s += `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="var(--surface)" stroke="${ser.c}" stroke-width="2"/>`));
   });
   return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
 }
@@ -325,18 +357,105 @@ function barChart(w, h, vals, labels) {
 }
 
 function donut(size, vals) {
-  const r = size / 2 - 8, c = size / 2, tot = vals.reduce((a, b) => a + b, 0);
+  const sw = Math.max(16, Math.round(size * 0.13));
+  const r = size / 2 - sw / 2 - 2, c = size / 2, tot = vals.reduce((a, b) => a + b, 0);
   let a0 = -Math.PI / 2, s = '';
   vals.forEach((v, i) => {
     const a1 = a0 + (v / tot) * Math.PI * 2 * (fa ? -1 : 1);
     const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0, sweep = fa ? 0 : 1;
     const p = (a) => `${c + r * Math.cos(a)},${c + r * Math.sin(a)}`;
-    s += `<path d="M${p(a0)} A${r},${r} 0 ${large} ${sweep} ${p(a1)}" fill="none" stroke="var(--s${i + 1})" stroke-width="22"/>`;
+    s += `<path d="M${p(a0)} A${r},${r} 0 ${large} ${sweep} ${p(a1)}" fill="none" stroke="var(--s${i + 1})" stroke-width="${sw}"/>`;
     a0 = a1;
   });
-  s += `<text x="${c}" y="${c - 2}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${eurC(998000)}</text>`;
+  s += `<text x="${c}" y="${c - 2}" text-anchor="middle" font-size="${size > 180 ? 20 : 16}" font-weight="700" fill="var(--text)">${eurC(998000)}</text>`;
   s += `<text x="${c}" y="${c + 16}" text-anchor="middle" font-size="11" fill="var(--muted)">${T.revenue}</text>`;
-  return `<svg viewBox="0 0 ${size} ${size}" style="width:${size}px;height:${size}px;flex:none">${s}</svg>`;
+  return `<svg class="ch" viewBox="0 0 ${size} ${size}" style="width:${size}px;height:${size}px;flex:none">${s}</svg>`;
+}
+
+// Donut sized to its card: the ring never overflows and the legend keeps its space.
+function donutCard(w, h, vals) {
+  const size = Math.max(110, Math.min(h, w - 170));
+  const leg = T.cats.map((t, i) => `<span><i style="background:var(--s${i + 1})"></i>${t} <b style="margin-inline-start:6px">${pct(vals[i])}</b></span>`).join('');
+  return `<div class="donut-wrap">${donut(size, vals)}<div class="donut-leg">${leg}</div></div>`;
+}
+
+// Shared value axis for the vertical charts. In Persian the category axis is mirrored.
+function frame(w, h, max, fmt, steps = 4) {
+  const yw = fa ? 56 : 46;
+  const pad = fa ? { t: 8, r: yw, b: 24, l: 8 } : { t: 8, r: 8, b: 24, l: yw };
+  const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const Y = (v) => pad.t + ih - (v / max) * ih;
+  const Xf = (f) => (fa ? pad.l + iw - f * iw : pad.l + f * iw);
+  let s = '';
+  for (let g = 0; g <= steps; g++) {
+    const v = (max / steps) * g, y = Y(v);
+    s += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${y}" y2="${y}" stroke="var(--grid)"/>`;
+    s += `<text x="${fa ? w - 2 : pad.l - 8}" y="${y + 4}" font-size="11" fill="var(--muted)" text-anchor="end">${fmt(v)}</text>`;
+  }
+  return { s, Y, Xf, pad, iw, ih };
+}
+
+function stackedBar(w, h) {
+  const data = [[62, 70, 74, 92], [48, 52, 61, 70], [33, 38, 41, 52], [20, 22, 25, 31]];
+  const f = frame(w, h, 260, (v) => cf.format(v * 1000));
+  let s = f.s;
+  const n4 = 4, slot = f.iw / n4, bw = Math.min(56, slot * 0.5);
+  for (let i = 0; i < n4; i++) {
+    const cx = f.Xf((i + 0.5) / n4);
+    let acc = 0;
+    data.forEach((ser, k) => {
+      const y0 = f.Y(acc), y1 = f.Y(acc + ser[i]);
+      s += `<rect x="${cx - bw / 2}" y="${y1}" width="${bw}" height="${y0 - y1}" fill="var(--s${k + 1})" stroke="var(--surface)" stroke-width="1.5" rx="2"/>`;
+      acc += ser[i];
+    });
+    s += `<text x="${cx}" y="${h - 6}" font-size="11" fill="var(--muted)" text-anchor="middle">${T.quarters[i]}</text>`;
+  }
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
+}
+
+function scatter(w, h) {
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const f = frame(w, h, 600, (v) => eur(v));
+  let s = f.s;
+  for (let t = 0; t <= 40; t += 10) {
+    const edge = t === 40 ? (fa ? 'start' : 'end') : t === 0 ? (fa ? 'end' : 'start') : 'middle';
+    s += `<text x="${f.Xf(t / 40)}" y="${h - 6}" font-size="11" fill="var(--muted)" text-anchor="${edge}">${pct(t)}</text>`;
+  }
+  for (let i = 0; i < 70; i++) {
+    const k = i % 4, disc = rnd() * 38, prof = Math.max(10, 520 - disc * 11 + (rnd() - 0.5) * 220 - k * 40);
+    s += `<circle cx="${f.Xf(disc / 40)}" cy="${f.Y(prof)}" r="4.5" fill="var(--s${k + 1})" fill-opacity=".85" stroke="var(--surface)"/>`;
+  }
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
+}
+
+function heatmap(w, h) {
+  const days = [...Array(7)].map((_, i) => new Intl.DateTimeFormat(fa ? 'fa-IR-u-ca-gregory' : 'en-US', { weekday: fa ? 'long' : 'short' }).format(new Date(2025, 0, 6 + i)));
+  const lw = fa ? 64 : 40, cols = 12, rows = 7, top = 2, bottom = 20;
+  const cw = (w - lw) / cols, ch = (h - top - bottom) / rows;
+  let s = '';
+  for (let r = 0; r < rows; r++) {
+    s += `<text x="${fa ? w - 2 : lw - 8}" y="${top + r * ch + ch / 2 + 4}" font-size="11" fill="var(--muted)" text-anchor="end">${days[r]}</text>`;
+    for (let c = 0; c < cols; c++) {
+      const hour = c * 2, work = r < 5 ? 1 : 0.55;
+      const v = Math.max(0.04, Math.exp(-((hour - 13) ** 2) / 22) * work + (hour >= 18 && hour <= 22 ? 0.25 : 0) * (r >= 4 ? 1.2 : 0.6));
+      const x = fa ? w - lw - (c + 1) * cw : lw + c * cw;
+      s += `<rect x="${x + 1.5}" y="${top + r * ch + 1.5}" width="${cw - 3}" height="${ch - 3}" rx="3" fill="var(--accent)" fill-opacity="${Math.min(1, 0.1 + v * 0.9).toFixed(2)}"/>`;
+    }
+  }
+  for (let c = 0; c < cols; c += 2) {
+    const x = fa ? w - lw - c * cw - cw / 2 : lw + c * cw + cw / 2;
+    s += `<text x="${x}" y="${h - 4}" font-size="11" fill="var(--muted)" text-anchor="middle">${new Intl.NumberFormat(loc, { minimumIntegerDigits: 2 }).format(c * 2)}:${fa ? '۰۰' : '00'}</text>`;
+  }
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}">${s}</svg>`;
+}
+
+// Table widget mockup following TanStack Table: sortable headers, pagination footer.
+function dataTable(cols, rows, { sorted, total, pages = 10 }) {
+  const head = cols.map((c, i) => `<th class="${c.n ? 'n' : ''} ${i === sorted ? 'sorted' : ''}">${c.t}<span class="s">${I(i === sorted ? 'sortD' : 'sortN').replace('class="i"', 'class="i" style="width:13px;height:13px"')}</span></th>`).join('');
+  const body = rows.map((r) => `<tr>${r.map((v, i) => `<td class="${cols[i].n ? 'n' : ''}" ${cols[i].m ? 'style="color:var(--muted)"' : ''}>${v}</td>`).join('')}</tr>`).join('');
+  const pg = `<div class="pg"><span class="dis">${I('chevS')}</span><span class="on">${n(1)}</span><span>${n(2)}</span><span>${n(3)}</span>${pages > 3 ? `<span style="border:0;background:none">…</span><span>${n(pages)}</span>` : ''}<span>${I('chevE')}</span></div>`;
+  return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table><div class="tfoot"><span>${T.rowsOf(n(1), n(rows.length), n(total))}${fa ? '، ' : ' · '}${T.perPage}</span>${pg}</div>`;
 }
 
 const cats = [38, 29, 21, 12];
@@ -370,11 +489,18 @@ function dashboardGrid(edit) {
   const handle = edit ? '<div class="handle"></div>' : '';
   const more = edit ? '' : `<span class="more" style="color:var(--muted)">${I('more')}</span>`;
   let g = kpis.map((k) => kpiCard(k, handle)).join('');
-  g += `<div class="card ${edit ? 'sel' : ''}" style="grid-column:span ${edit ? 12 : 8};grid-row:span 4">${sel}${handle}<h3>${T.byMonth}${more}</h3>${legend(['2025', '2024'])}${C((w, h) => lineChart(w, h, [{ data: revenue, c: 'var(--s1)' }, { data: prev, c: 'var(--s3)', dash: true }], months, { area: true }))}</div>`;
+  g += `<div class="card ${edit ? 'sel' : ''}" style="grid-column:span ${edit ? 12 : 8};grid-row:span ${edit ? 4 : 5}">${sel}${handle}<h3>${T.byMonth}${more}</h3>${legend(['2025', '2024'])}${C((w, h) => lineChart(w, h, [{ data: revenue, c: 'var(--s1)' }, { data: prev, c: 'var(--s3)', dash: true }], months, { area: true }))}</div>`;
   if (!edit) {
-    g += `<div class="card" style="grid-column:span 4;grid-row:span 4"><h3>${T.byCategory || T.byCat}${more}</h3><div style="display:flex;align-items:center;gap:16px;flex:1">${donut(170, cats)}<div style="display:grid;gap:8px;font-size:13px">${T.cats.map((t, i) => `<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--s${i + 1});margin-inline-end:8px"></i>${t} <b style="margin-inline-start:6px">${pct(cats[i])}</b></span>`).join('')}</div></div></div>`;
-    g += `<div class="card" style="grid-column:span 5;grid-row:span 4"><h3>${T.byCountry}${more}</h3>${C((w, h) => barChart(w, h, [312, 241, 168, 131, 88, 58], T.countries))}</div>`;
-    g += `<div class="card" style="grid-column:span 7;grid-row:span 4"><h3>${T.top}${more}</h3><table><thead><tr><th>${T.product}</th><th>${T.cat}</th><th class="n">${T.qty}</th><th class="n">${T.rev}</th></tr></thead><tbody>${T.prods.map((p) => `<tr><td>${p[0]}</td><td style="color:var(--muted)">${p[1]}</td><td class="n">${n(p[2])}</td><td class="n">${eur(+p[3].replace(',', ''))}</td></tr>`).join('')}</tbody></table></div>`;
+    const card = (span, title, body, cls = '') => `<div class="card ${cls}" style="grid-column:span ${span};grid-row:span 5"><h3>${title}${more}</h3>${body}</div>`;
+    const prodRows = T.prods.map((p) => [p[0], p[1], n(p[2]), eur(+p[3].replace(',', ''))]);
+    const cumul = [8, 17, 28, 38, 50, 63, 75, 89, 104, 117, 129, 136];
+    g += card(4, T.byCat, C((w, h) => donutCard(w, h, cats)));
+    g += card(7, T.byCatQ, legend(T.cats) + C((w, h) => stackedBar(w, h)));
+    g += card(5, T.byCountry, C((w, h) => barChart(w, h, [312, 241, 168, 131, 88, 58], T.countries)));
+    g += card(7, T.heatT, C((w, h) => heatmap(w, h)));
+    g += card(5, T.scatterT, legend(T.cats) + C((w, h) => scatter(w, h)));
+    g += card(5, T.areaT, C((w, h) => lineChart(w, h, [{ data: cumul, c: 'var(--s3)' }], months, { area: true, noDots: true, every: 2 })));
+    g += card(7, T.top, dataTable([{ t: T.product }, { t: T.cat, m: 1 }, { t: T.qty, n: 1 }, { t: T.rev, n: 1 }], prodRows, { sorted: 3, total: 48 }), 'tcard');
   } else {
     g += `<div class="card" style="grid-column:span 6;grid-row:span 3">${handle}<h3>${T.byCountry}</h3>${C((w, h) => barChart(w, h, [312, 241, 168, 131], T.countries.slice(0, 4)))}</div>`;
     g += `<div class="drop" style="grid-column:span 6;grid-row:span 3"><span>${I('plus')} ${T.dropHere}</span></div>`;
@@ -390,7 +516,7 @@ function viewDashboard() {
 }
 
 function viewEdit() {
-  const pal = [['kpi', T.kpi], ['line', T.line], ['bar', T.bar], ['pie', T.pie], ['table', T.table]];
+  const pal = [['kpi', T.kpi], ['line', T.line], ['area', T.areaChart], ['bar', T.bar], ['stack', T.stacked], ['pie', T.pie], ['scatter', T.scatter], ['heat', T.heatmap], ['table', T.table]];
   const months = fa ? T.months.map((m) => m.slice(0, 4)) : T.months;
   return `<div class="app edit">${header('edit')}<main>
     <aside><h4>${T.widgets}</h4><div class="pal">${pal.map(([k, t]) => `<div class="${k === 'bar' ? 'dragging' : ''}">${I(k)}${t}<span class="grip">${I('grip')}</span></div>`).join('')}</div><p class="hint">${T.dragHint}</p></aside>
@@ -418,7 +544,7 @@ function viewQB() {
   const s = T.sent;
   const months = fa ? T.months.map((m) => m.slice(0, 4)) : T.months;
   const de = [21, 19, 24, 23, 26, 28, 27, 29, 31, 30, 34, 39];
-  const rows = [11, 10, 9, 8, 7].map((i) => `<tr><td>${T.months[i]} ${d(2025)}</td><td class="n">${eur(de[i] * 1000 + 412)}</td><td class="n">${n(Math.round(de[i] * 8.4))}</td></tr>`).join('');
+  const rowsQ = [11, 10, 9, 8, 7].map((i) => [`${T.months[i]} ${d(2025)}`, eur(de[i] * 1000 + 412), n(Math.round(de[i] * 8.4))]);
   return `<div class="app qb">${header('qb')}<main>
     <aside class="fields">
       <h4>${T.datasets}</h4>
@@ -437,8 +563,12 @@ function viewQB() {
         <div class="zone"><h5>${I('sort')}${T.sortLimit}</h5><span class="pill">${T.sortV}${I('down')}</span><span class="pill">${T.limitV}${I('down')}</span></div>
       </div>
       <div class="preview">
-        <div style="display:flex;flex-direction:column;min-height:0"><div style="display:flex;justify-content:space-between;align-items:center"><b>${T.preview}</b><span class="meta"><span>${T.rows}</span><span>${T.ms}</span><span>${T.cached}</span></span></div>${C((w, h) => lineChart(w, h, [{ data: de.map((v) => v * 3.2), c: 'var(--s1)' }], months, { area: true }))}</div>
-        <div><table><thead><tr><th>${T.month}</th><th class="n">${T.fRevenue}</th><th class="n">${T.orders}</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div style="display:flex;flex-direction:column;min-height:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>${T.preview}</b><span class="meta"><span>${T.rows}</span><span>${T.ms}</span><span>${T.cached}</span></span></div>
+          <div class="showas">${T.showAs}${['line', 'area', 'bar', 'stack', 'kpi', 'table'].map((k) => `<span class="t ${k === 'area' ? 'on' : ''}">${I(k)}</span>`).join('')}</div>
+          ${C((w, h) => lineChart(w, h, [{ data: de.map((v) => v * 3.2), c: 'var(--s1)' }], months, { area: true }))}
+        </div>
+        <div class="tcard">${dataTable([{ t: T.month }, { t: T.fRevenue, n: 1 }, { t: T.orders, n: 1 }], rowsQ, { sorted: 0, total: 12, pages: 3 })}</div>
       </div>
     </div>
   </main></div>`;

@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
         await page.goto(`${file}?view=${view}&theme=${theme}&lang=${lang}`, { waitUntil: 'networkidle' });
         await page.evaluate(() => document.fonts.ready);
         const out = path.join(__dirname, 'png', `${view}-${theme}-${lang}.png`);
-        await page.screenshot({ path: out });
+        await page.screenshot({ path: out, fullPage: true });
         console.log(out, await page.evaluate(() => [...document.fonts].filter((f) => f.status === 'loaded').length));
       }
   await browser.close();
