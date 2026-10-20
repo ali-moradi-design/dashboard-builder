@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+dist
+docs/mockups
+vendor
+public/data
+playwright-report
+test-results

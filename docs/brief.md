@@ -152,7 +152,6 @@ src/
 
 TanStack Virtual and Monaco were dropped: the minimal scope does not need them.
 
-
 - Build and language: Vite, React 19 with the React Compiler, TypeScript (strict).
 - Routing: TanStack Router (type-safe routes and search params, so filters live in
   the URL).

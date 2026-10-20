@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/vazirmatn';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* Semantic tokens from the approved palette (docs/mockups/README.md). */
+:root {
+  --bg: #fdfdff;
+  --surface: #f4f4f1;
+  --surface-2: #e9e9e3;
+  --border: #d6d5cb;
+  --text: #393d3f;
+  --muted: #546a7b;
+  --accent: #3f6f7a;
+  --accent-fg: #fdfdff;
+  --accent-soft: rgb(98 146 158 / 0.16);
+  --grid-line: #dddcd2;
+  --danger: #a33a3a;
+  --s1: #4a7f8b;
+  --s2: #8a887a;
+  --s3: #546a7b;
+  --s4: #2f5963;
+  --s5: #6f8d9c;
+  --app-font: 'Inter Variable', system-ui, sans-serif;
+  color-scheme: light;
+}
+[data-theme='dark'] {
+  --bg: #2a2d2f;
+  --surface: #393d3f;
+  --surface-2: #43484a;
+  --border: #50565a;
+  --text: #fdfdff;
+  --muted: #c6c5b9;
+  --accent: #7fb0bc;
+  --accent-fg: #2a2d2f;
+  --accent-soft: rgb(127 176 188 / 0.16);
+  --grid-line: #4a5054;
+  --danger: #e08a8a;
+  --s1: #7fb0bc;
+  --s2: #c6c5b9;
+  --s3: #8c9fb0;
+  --s4: #d9e6e9;
+  --s5: #5e98a6;
+  color-scheme: dark;
+}
+[lang='fa'] {
+  --app-font: 'Vazirmatn Variable', system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-grid-line: var(--grid-line);
+  --color-danger: var(--danger);
+  --font-sans: var(--app-font);
+  --radius-card: 10px;
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+  body {
+    @apply font-sans text-sm antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
