@@ -3,6 +3,7 @@ import { LayoutDashboard, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { newId, useDashboards, useDeleteDashboard, useSaveDashboard } from '@/entities/dashboard'
+import { ImportButton } from '@/features/export-import-dashboard'
 import { formatDate, formatNumber, useFormat } from '@/shared/lib'
 import { Button, Card } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
@@ -38,6 +39,13 @@ export function DashboardsListPage() {
             <p className="mt-1 text-muted">{t('list.subtitle')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <ImportButton
+              existingIds={new Set((dashboards ?? []).map((d) => d.id))}
+              onImport={async (d) => {
+                await save.mutateAsync(d)
+                await navigate({ to: '/d/$dashboardId', params: { dashboardId: d.id } })
+              }}
+            />
             <Button variant="primary" onClick={() => void create()} disabled={save.isPending}>
               <Plus aria-hidden />
               {t('list.new')}

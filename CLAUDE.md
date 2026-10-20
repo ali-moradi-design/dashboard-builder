@@ -8,8 +8,8 @@ every session. Do not add features beyond its scope without asking.
 
 - Small steps: branch → PR → squash merge into `main`. Test every PR locally
   before pushing: `pnpm check` (lint, Steiger, format, typecheck, unit, build)
-  and `pnpm e2e`. GitHub Actions CI is added at the end of the build (user
-  decision, 2026-10-20); until then local checks are the gate.
+  and `pnpm e2e`. GitHub Actions CI (`.github/workflows/ci.yml`) runs the same
+  steps; merge when it is green.
 - Node 24 and pnpm 10. In a sandbox with a preinstalled Chromium, run E2E with
   `PW_CHROMIUM_PATH=<path to chrome> pnpm e2e`.
 - Explain each step to the user.

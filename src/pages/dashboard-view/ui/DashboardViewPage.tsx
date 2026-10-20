@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useDashboard } from '@/entities/dashboard'
 import { useDataset } from '@/entities/dataset'
 import { DateRangeFilter } from '@/features/apply-date-filter'
+import { ExportButton } from '@/features/export-import-dashboard'
 import type { DateRange } from '@/shared/lib/query-engine'
 import { Button } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
@@ -39,12 +40,15 @@ export function DashboardViewPage() {
       <AppHeader
         crumbs={dashboard.title}
         actions={
-          <Button variant="primary" asChild>
-            <Link to="/d/$dashboardId/edit" params={{ dashboardId }} search={search}>
-              <Pencil aria-hidden />
-              {t('view.edit')}
-            </Link>
-          </Button>
+          <>
+            <ExportButton dashboard={dashboard} />
+            <Button variant="primary" asChild>
+              <Link to="/d/$dashboardId/edit" params={{ dashboardId }} search={search}>
+                <Pencil aria-hidden />
+                {t('view.edit')}
+              </Link>
+            </Button>
+          </>
         }
       />
       <main className="p-4 sm:p-5">

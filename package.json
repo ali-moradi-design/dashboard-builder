@@ -1,7 +1,7 @@
 {
   "name": "dashboard-builder",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
   "engines": {
@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "data": "node scripts/generate-datasets.mjs"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
