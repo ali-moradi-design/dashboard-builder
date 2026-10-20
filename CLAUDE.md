@@ -3,6 +3,8 @@
 Dashboard builder demo: build dashboards from data without code. The full brief,
 decisions, scope and libraries are in `docs/brief.md`. Read it at the start of
 every session. Do not add features beyond its scope without asking.
+`docs/build-log.md` records how the app was built and the plan for walking
+the user through the code step by step.
 
 ## Workflow
 
