@@ -63,6 +63,7 @@ export function PieChart({ widget, settings: s, rows, columns, dataset }: Render
             bottom: 0,
             left: 'center',
             right: 'auto',
+            textStyle: { color: theme.text, fontFamily: theme.font, fontSize: 12 },
           },
           series: [{ center: ['50%', '44%'], radius: s.donut ? ['40%', '66%'] : ['0%', '66%'] }],
         },

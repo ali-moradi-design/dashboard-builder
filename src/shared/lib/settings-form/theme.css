@@ -1,0 +1,20 @@
+/* Map formweave's look onto the app's tokens (theirs live in a lower cascade layer). */
+.fw-form.settings-form {
+  --fw-font: inherit;
+  --fw-text: var(--text);
+  --fw-muted: var(--muted);
+  --fw-faint: var(--muted);
+  --fw-surface: var(--bg);
+  --fw-surface-2: var(--surface-2);
+  --fw-line: var(--border);
+  --fw-primary: var(--accent);
+  --fw-primary-text: var(--accent-fg);
+  --fw-primary-soft: var(--accent-soft);
+  --fw-accent: var(--accent);
+  --fw-accent-text: var(--accent);
+  --fw-danger: var(--danger);
+  --fw-radius: 8px;
+  --fw-gap: 12px;
+  --fw-control-height: 36px;
+  font-size: 14px;
+}

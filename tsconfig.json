@@ -18,7 +18,15 @@
     "noEmit": true,
     "types": ["vite/client", "node", "@testing-library/jest-dom/vitest"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@formweave/schema": ["./vendor/form-builder/packages/schema/src/index.ts"],
+      "@formweave/schema/meta": ["./vendor/form-builder/packages/schema/src/meta.ts"],
+      "@formweave/engine": ["./vendor/form-builder/packages/engine/src/index.ts"],
+      "@formweave/engine/fields": ["./vendor/form-builder/packages/engine/src/fields/index.ts"],
+      "@formweave/engine/fields/all": ["./vendor/form-builder/packages/engine/src/fields/all.ts"],
+      "@formweave/engine/*": ["./vendor/form-builder/packages/engine/src/*.ts"],
+      "@formweave/react": ["./vendor/form-builder/packages/react/src/index.ts"],
+      "@formweave/react/fields": ["./vendor/form-builder/packages/react/src/fields/index.ts"]
     }
   },
   "include": [

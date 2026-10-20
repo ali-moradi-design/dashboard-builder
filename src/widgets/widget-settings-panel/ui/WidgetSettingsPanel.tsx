@@ -17,6 +17,13 @@ import { localize } from '@/shared/lib/localized'
 import { SettingsForm } from '@/shared/lib/settings-form'
 import { Button } from '@/shared/ui'
 
+/** Select options are strings in formweave; the color index is stored as a number. */
+function formValues(settings: Record<string, unknown>): Record<string, unknown> {
+  return 'colorOffset' in settings
+    ? { ...settings, colorOffset: String(settings.colorOffset) }
+    : settings
+}
+
 export interface WidgetSettingsPanelProps {
   widget: Widget
   onEditQuery: () => void
@@ -97,8 +104,9 @@ export function WidgetSettingsPanel({ widget, onEditQuery }: WidgetSettingsPanel
       <SettingsForm
         key={`${widget.id}-${widget.type}-${historyRev}`}
         document={settingsForm(widget.type)}
-        values={parseSettings(widget.type, widget.settings)}
+        values={formValues(parseSettings(widget.type, widget.settings))}
         locale={fmt.lang}
+        digits={fmt.digits}
         onChange={(values, name) =>
           updateWidget(widget.id, { settings: values }, name ? `settings.${name}` : 'settings')
         }
