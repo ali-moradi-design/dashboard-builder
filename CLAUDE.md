@@ -12,7 +12,7 @@ the user through the code step by step.
   before pushing: `pnpm check` (lint, Steiger, format, typecheck, unit, build)
   and `pnpm e2e`. GitHub Actions CI (`.github/workflows/ci.yml`) runs the same
   steps; merge when it is green.
-- Node 24 and pnpm 10. In a sandbox with a preinstalled Chromium, run E2E with
+- Node 24 and pnpm 12. In a sandbox with a preinstalled Chromium, run E2E with
   `PW_CHROMIUM_PATH=<path to chrome> pnpm e2e`.
 - Explain each step to the user.
 - Do not copy code from the user's former employer's dashboard builder.
