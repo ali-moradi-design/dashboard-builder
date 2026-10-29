@@ -5,3 +5,5 @@ docs/mockups/out/
 test-results/
 playwright-report/
 .DS_Store
+# leftovers of `pnpm data` (the datasets live in public/data)
+/*.parquet
