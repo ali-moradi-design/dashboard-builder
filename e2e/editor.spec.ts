@@ -103,7 +103,7 @@ test('moves a widget on the grid and undoes the move', async ({ page }) => {
     .toBe(Math.round(before.x))
 })
 
-test('changes widget settings in the formweave form and undoes them', async ({ page }) => {
+test('changes widget settings in the formcanvas form and undoes them', async ({ page }) => {
   await newDashboard(page)
   await page.getByTestId('palette-line').click()
   const points = page.getByLabel('Show points')

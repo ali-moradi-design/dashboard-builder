@@ -1,2 +1,6 @@
 allowBuilds:
   simple-git-hooks: false
+minimumReleaseAgeExclude:
+  - '@formcanvas/engine@0.1.0'
+  - '@formcanvas/react@0.1.0'
+  - '@formcanvas/schema@0.1.0'

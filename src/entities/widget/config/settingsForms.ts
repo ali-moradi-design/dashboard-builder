@@ -122,7 +122,7 @@ const fields: Record<WidgetType, FormField[]> = {
   ],
 }
 
-/** Settings form of each widget type, as a formweave form document (JSON). */
+/** Settings form of each widget type, as a formcanvas form document (JSON). */
 export function settingsForm(type: WidgetType): FormDocument {
   return {
     schemaVersion: 1,

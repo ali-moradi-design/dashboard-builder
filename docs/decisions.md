@@ -12,15 +12,14 @@ Changes to or details of the brief, with the reason.
   (with the placeholder that shows where the widget will land) only listens to
   native HTML drag events. Field drag in the query builder uses dnd-kit as
   planned. Every drag has a keyboard or click alternative.
-- **Widget settings forms.** Each form is a formweave `FormDocument` (JSON) in
-  `entities/widget/config/settingsForms.ts`, rendered by the formweave engine
-  through `shared/lib/settings-form`. The packages come from the form-builder
-  repo as a git submodule (`vendor/form-builder`, pinned commit) and are
-  compiled from source through Vite and TypeScript path aliases, because the
-  package build is not published and its workspace dependencies do not
-  resolve as a git dependency. When the packages are on npm, replace the
-  aliases with the npm packages. A unit test compiles every settings form with
-  the real engine.
+- **Widget settings forms.** Each form is a formcanvas `FormDocument` (JSON) in
+  `entities/widget/config/settingsForms.ts`, rendered by the formcanvas engine
+  through `shared/lib/settings-form`. The packages (`@formcanvas/schema`,
+  `@formcanvas/engine`, `@formcanvas/react`) come from npm at pinned versions.
+  They were first a git submodule compiled from source through Vite and
+  TypeScript path aliases, while they were not published (as `@formweave/*`).
+  The form is themed by mapping the `--fc-*` variables onto the app tokens. A
+  unit test compiles every settings form with the real engine.
 - **Scatter and heatmap data.** Scatter plots aggregate per group (first
   group-by = point, second = color). The sample data has weekday and hour
   fields with a `display` hint so the heatmap shows day names and times.

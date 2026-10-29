@@ -1,5 +1,5 @@
-// Widget settings forms are formweave documents; these are its own types.
-import type { FieldNode, FormDocument, LocalizedText } from '@formweave/schema'
+// Widget settings forms are formcanvas documents; these are its own types.
+import type { FieldNode, FormDocument, LocalizedText } from '@formcanvas/schema'
 
 export type { FormDocument }
 export type FormField = FieldNode

@@ -114,13 +114,9 @@ defined as JSON and rendered by the form builder engine from the user's
 `form-builder` project (the use case from the user's former job, and proof that
 the package works in another project).
 
-- The packages are built but not on npm yet: install them from the user's GitHub
-  repo for now, pinned to a commit (for example pnpm's git dependency with a
-  `#path:` sub-directory, if the package builds on install; otherwise a git
-  submodule or a workspace link). Check what works with the repo's setup.
-- When the packages are published on npm, switch to the npm version. Keep the
-  import behind one small adapter in `shared/lib/settings-form` so the switch is a
-  one-file change.
+- The packages are published on npm as `@formcanvas/*`; install them from npm,
+  pinned to exact versions. Keep the import behind one small adapter in
+  `shared/lib/settings-form`.
 
 ## Architecture (FSD)
 

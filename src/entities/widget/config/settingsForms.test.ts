@@ -1,5 +1,5 @@
-import { compile, createRegistry } from '@formweave/engine'
-import { allFields } from '@formweave/engine/fields/all'
+import { compile, createRegistry } from '@formcanvas/engine'
+import { allFields } from '@formcanvas/engine/fields/all'
 import { describe, expect, it } from 'vitest'
 
 import { settingsSchemas } from '../model/settings'
@@ -9,7 +9,7 @@ import { settingsForm } from './settingsForms'
 const registry = createRegistry(allFields)
 
 describe('widget settings forms', () => {
-  it.each(widgetTypes)('the %s form is a valid formweave document for its settings', (type) => {
+  it.each(widgetTypes)('the %s form is a valid formcanvas document for its settings', (type) => {
     const doc = settingsForm(type)
     const compiled = compile(doc, { registry })
     expect(compiled).toBeTruthy()
