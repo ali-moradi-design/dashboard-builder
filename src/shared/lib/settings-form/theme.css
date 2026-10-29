@@ -1,20 +1,20 @@
-/* Map formweave's look onto the app's tokens (theirs live in a lower cascade layer). */
-.fw-form.settings-form {
-  --fw-font: inherit;
-  --fw-text: var(--text);
-  --fw-muted: var(--muted);
-  --fw-faint: var(--muted);
-  --fw-surface: var(--bg);
-  --fw-surface-2: var(--surface-2);
-  --fw-line: var(--border);
-  --fw-primary: var(--accent);
-  --fw-primary-text: var(--accent-fg);
-  --fw-primary-soft: var(--accent-soft);
-  --fw-accent: var(--accent);
-  --fw-accent-text: var(--accent);
-  --fw-danger: var(--danger);
-  --fw-radius: 8px;
-  --fw-gap: 12px;
-  --fw-control-height: 36px;
+/* Map formcanvas's look onto the app's tokens (theirs live in a lower cascade layer). */
+.fc-form.settings-form {
+  --fc-font: inherit;
+  --fc-text: var(--text);
+  --fc-muted: var(--muted);
+  --fc-faint: var(--muted);
+  --fc-surface: var(--bg);
+  --fc-surface-2: var(--surface-2);
+  --fc-line: var(--border);
+  --fc-primary: var(--accent);
+  --fc-primary-text: var(--accent-fg);
+  --fc-primary-soft: var(--accent-soft);
+  --fc-accent: var(--accent);
+  --fc-accent-text: var(--accent);
+  --fc-danger: var(--danger);
+  --fc-radius: 8px;
+  --fc-gap: 12px;
+  --fc-control-height: 36px;
   font-size: 14px;
 }

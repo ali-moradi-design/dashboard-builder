@@ -14,8 +14,7 @@ the repo.
 - Use `graphify query "<question>" --budget 1500` (run `graphify update .`
   first in a fresh clone) to find where things are used, instead of reading
   many files.
-- Run the app while explaining: `git submodule update --init`, `pnpm install`,
-  `pnpm dev`.
+- Run the app while explaining: `pnpm install`, `pnpm dev`.
 
 ## Timeline (pull requests)
 
@@ -195,8 +194,7 @@ Files: `src/widgets/query-builder-panel/*`,
 ### Part 10 — Settings forms with formweave (PR #8, #10)
 
 Files: `src/entities/widget/config/settingsForms.ts`,
-`src/shared/lib/settings-form/*`, `vite.config.ts`, `tsconfig.json`,
-`.gitmodules`.
+`src/shared/lib/settings-form/*`, `package.json`.
 
 - Settings forms are formweave `FormDocument` JSON, one per widget type.
 - First a temporary React Hook Form renderer (installing formweave was
@@ -206,6 +204,10 @@ Files: `src/entities/widget/config/settingsForms.ts`,
 - Problems found in formweave and filed in form-builder: #44 `className`
   drops `fw-form`, #45 dark mode follows the OS not the host, #46 choice
   values must be strings, #47 packages not installable from GitHub.
+- Later the packages were published on npm as `@formcanvas/*`: the submodule
+  and aliases were removed, the packages installed from npm (pinned `0.1.0`),
+  imports moved to `@formcanvas/*` and the `fw-` class and CSS variables to
+  `fc-`.
 - A unit test compiles every settings form with the real engine.
 
 ### Part 11 — Sharing, tests, CI and deploy (PR #9)
@@ -220,7 +222,7 @@ Files: `src/features/export-import-dashboard`, `e2e/*`,
   checks, a full flow (build, query, view, export, import), drag and drop,
   undo/redo, RTL.
 - CI: install → lint (ESLint + Steiger) → format → typecheck → unit → build →
-  E2E; checks out submodules.
+  E2E.
 - Deploy: static site; Nginx with SPA fallback, long cache for hashed assets,
   wasm MIME type and gzip.
 
@@ -239,6 +241,4 @@ Files: `src/features/export-import-dashboard`, `e2e/*`,
 ## Still open
 
 - Mark the `ci` check as required on `main` (GitHub settings, user).
-- When formweave is on npm: replace the submodule and aliases with the npm
-  packages.
 - Deploy to the VPS (roadmap phase 7).

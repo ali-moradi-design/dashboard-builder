@@ -29,7 +29,6 @@ Design checked by Steiger. Vitest and Playwright (with axe).
 ## Scripts
 
 ```sh
-git submodule update --init   # formweave packages (form-builder)
 pnpm install
 pnpm dev          # start the app
 pnpm check        # lint, Steiger, format, typecheck, unit tests, build

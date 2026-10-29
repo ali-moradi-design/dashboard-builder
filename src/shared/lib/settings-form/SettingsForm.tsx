@@ -1,17 +1,16 @@
-import { createRegistry } from '@formweave/engine'
-import { allFields } from '@formweave/engine/fields/all'
-import { createRenderers, Form } from '@formweave/react'
-import { basicRenderers } from '@formweave/react/fields'
-import '@formweave/react/styles.css'
+import { createRegistry } from '@formcanvas/engine'
+import { allFields } from '@formcanvas/engine/fields/all'
+import { createRenderers, Form } from '@formcanvas/react'
+import { basicRenderers } from '@formcanvas/react/fields'
+import '@formcanvas/react/styles.css'
 
 import type { Lang } from '../../model'
 import type { FormDocument, FormValues } from './document'
 import './theme.css'
 
 /*
- * Adapter for widget settings forms, rendered by the formweave engine from the
- * user's form-builder project (vendor/form-builder submodule, pinned commit).
- * When the packages are published on npm, only the import paths change.
+ * Adapter for widget settings forms, rendered by the formcanvas engine from the
+ * user's form-builder project (@formcanvas/* packages from npm, pinned versions).
  */
 export interface SettingsFormProps {
   document: FormDocument
@@ -34,7 +33,7 @@ export function SettingsForm({
 }: SettingsFormProps) {
   return (
     <Form
-      className="fw-form settings-form"
+      className="fc-form settings-form"
       schema={document}
       registry={registry}
       renderers={renderers}

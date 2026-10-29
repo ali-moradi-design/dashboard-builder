@@ -17,7 +17,7 @@ import { localize } from '@/shared/lib/localized'
 import { SettingsForm } from '@/shared/lib/settings-form'
 import { Button } from '@/shared/ui'
 
-/** Select options are strings in formweave; the color index is stored as a number. */
+/** Select options are strings in formcanvas; the color index is stored as a number. */
 function formValues(settings: Record<string, unknown>): Record<string, unknown> {
   return 'colorOffset' in settings
     ? { ...settings, colorOffset: String(settings.colorOffset) }
