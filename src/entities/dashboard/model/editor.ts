@@ -125,8 +125,12 @@ export const useEditor = create<EditorState>()(
           if (!changed) return
           change((dash) =>
             mapWidgets(dash, (w) => {
+              // Widgets that did not move keep their identity (and skip re-rendering).
               const l = byId.get(w.id)
-              return l ? { ...w, layout: { x: l.x, y: l.y, w: l.w, h: l.h } } : w
+              const o = w.layout
+              return l && (l.x !== o.x || l.y !== o.y || l.w !== o.w || l.h !== o.h)
+                ? { ...w, layout: { x: l.x, y: l.y, w: l.w, h: l.h } }
+                : w
             }),
           )
         },

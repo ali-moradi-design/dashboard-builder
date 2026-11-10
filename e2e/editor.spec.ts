@@ -95,6 +95,14 @@ test('moves a widget on the grid and undoes the move', async ({ page }) => {
   await page.mouse.move(before.x + 60, before.y + 60)
   await page.mouse.down()
   await page.mouse.move(before.x + 300, before.y + 60, { steps: 12 })
+  // The landing spot uses the theme's accent color, not the library's red,
+  // and dragging does not select the widget's text.
+  const placeholder = page.locator('.react-grid-placeholder')
+  await expect(placeholder).toBeVisible()
+  expect(await placeholder.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(
+    'rgb(255, 0, 0)',
+  )
+  expect(await page.evaluate(() => String(getSelection()))).toBe('')
   await page.mouse.up()
   await expect.poll(async () => (await item.boundingBox())?.x).toBeGreaterThan(before.x + 100)
   await page.keyboard.press('Control+z')

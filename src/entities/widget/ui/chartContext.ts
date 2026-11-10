@@ -79,6 +79,8 @@ export function tooltip(theme: ChartTheme, trigger: 'axis' | 'item') {
     textStyle: { color: theme.text, fontFamily: theme.font, fontSize: 12 },
     extraCssText: theme.rtl ? 'direction: rtl; text-align: right;' : '',
     confine: true,
+    // Lets the editor hide tooltips while a widget is dragged.
+    className: 'chart-tooltip',
   }
 }
 

@@ -90,10 +90,30 @@
   background-size: calc((100% + 16px) / 12) 72px;
   background-position: -8px -8px;
 }
-.editable-grid .react-grid-placeholder {
-  background: var(--accent);
-  opacity: 0.18;
+/*
+ * Where the dragged widget will land. The library's stylesheet loads with the
+ * editor (after this file) and paints it red, so these selectors are one class
+ * more specific than its `.react-grid-item.react-grid-placeholder`.
+ */
+.editable-grid .react-grid-item.react-grid-placeholder {
+  background: var(--accent-soft);
+  border: 2px dashed var(--accent);
+  opacity: 1;
   border-radius: 10px;
+}
+/* Dragging starts on the widget itself: its text must not get selected. */
+.editable-grid .react-grid-item {
+  user-select: none;
+}
+/*
+ * While a widget is moved or resized, widgets ignore the pointer: charts under
+ * the cursor would otherwise show tooltips and redraw on every mouse move.
+ */
+.editable-grid[data-dragging] .react-grid-item > * {
+  pointer-events: none;
+}
+.editable-grid[data-dragging] .chart-tooltip {
+  display: none !important;
 }
 .editable-grid .react-grid-item.react-draggable-dragging {
   z-index: 20;

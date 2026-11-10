@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { Check, Copy, MousePointerClick, Trash2 } from 'lucide-react'
-import { memo, useEffect } from 'react'
+import { memo, useDeferredValue, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDashboard, useEditor, useSaveDashboard } from '@/entities/dashboard'
@@ -185,6 +185,11 @@ export function DashboardEditPage() {
   const datasetId = dashboard?.widgets.find((w) => w.query)?.query?.datasetId
   const dataset = useDataset(datasetId)
   const dateRange = useDateRange(search, dashboard?.dateRange)
+  // A drag starts by selecting the widget: the selection ring shows at once,
+  // the settings form (a heavier render) follows without holding up the drag.
+  // Only the id is deferred, so the form always gets the widget's current data.
+  const panelId = useDeferredValue(selectedId)
+  const panelWidget = dashboard?.widgets.find((w) => w.id === panelId)
 
   if (stored.isLoading || !dashboard || dashboard.id !== dashboardId) {
     // Still reading from storage, or read and about to be loaded into the editor.
@@ -203,7 +208,6 @@ export function DashboardEditPage() {
     )
   }
 
-  const selected = dashboard.widgets.find((w) => w.id === selectedId)
   const queryWidget = search.query
     ? dashboard.widgets.find((w) => w.id === search.query)
     : undefined
@@ -283,8 +287,11 @@ export function DashboardEditPage() {
           aria-label={t('editor.settings')}
           className="border-border bg-surface p-4 lg:border-s"
         >
-          {selected ? (
-            <WidgetSettingsPanel widget={selected} onEditQuery={() => setQueryParam(selected.id)} />
+          {panelWidget ? (
+            <WidgetSettingsPanel
+              widget={panelWidget}
+              onEditQuery={() => setQueryParam(panelWidget.id)}
+            />
           ) : (
             <p className="text-sm text-muted">{t('editor.selectHint')}</p>
           )}
