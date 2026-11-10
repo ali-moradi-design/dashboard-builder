@@ -134,3 +134,23 @@ test('keeps an edit made right before leaving the editor', async ({ page }) => {
   await page.reload()
   await expect(page.getByRole('heading', { level: 1, name: 'Quarterly review' })).toBeVisible()
 })
+
+test('a dragged widget stays under the pointer', async ({ page }) => {
+  await newDashboard(page)
+  await page.getByTestId('palette-kpi').click()
+  const item = page.locator('.react-grid-item').first()
+  const start = await item.boundingBox()
+  if (!start) throw new Error('no box')
+  await page.mouse.move(start.x + 60, start.y + 20)
+  await page.mouse.down()
+  // Small steps that stay inside one grid cell: the widget must follow each of
+  // them, not wait until it reaches the next cell.
+  for (let i = 1; i <= 8; i++) {
+    await page.mouse.move(start.x + 60 + i * 9, start.y + 20 + i * 7)
+    await expect
+      .poll(async () => Math.round(((await item.boundingBox())?.x ?? 0) - start.x))
+      .toBe(i * 9)
+    expect(Math.round(((await item.boundingBox())?.y ?? 0) - start.y)).toBe(i * 7)
+  }
+  await page.mouse.up()
+})
