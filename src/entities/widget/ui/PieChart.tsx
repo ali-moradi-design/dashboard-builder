@@ -22,7 +22,7 @@ export function PieChart({ widget, settings: s, rows, columns, dataset }: Render
     legend: {
       show: s.showLegend,
       orient: 'vertical' as const,
-      [theme.rtl ? 'left' : 'right']: 0,
+      ...(theme.rtl ? { left: 0 } : { right: 0 }),
       top: 'middle',
       icon: 'roundRect',
       itemWidth: 10,

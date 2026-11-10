@@ -1,6 +1,13 @@
 export { deleteDashboard, getDashboard, listDashboards, saveDashboard } from './api/repository'
 export { sampleDashboard } from './config/sample'
-export { useDashboard, useDashboards, useDeleteDashboard, useSaveDashboard } from './model/queries'
+export {
+  dashboardQuery,
+  dashboardsQuery,
+  useDashboard,
+  useDashboards,
+  useDeleteDashboard,
+  useSaveDashboard,
+} from './model/queries'
 export {
   CURRENT_SCHEMA_VERSION,
   DashboardFormatError,

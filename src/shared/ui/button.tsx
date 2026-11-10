@@ -29,7 +29,8 @@ export interface ButtonProps extends ComponentProps<'button'>, VariantProps<type
   asChild?: boolean
 }
 
-export function Button({ className, variant, size, asChild = false, type, ...props }: ButtonProps) {
+// No default values in the parameter destructuring: the React Compiler skips such components.
+export function Button({ className, variant, size, asChild, type, ...props }: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button'
   return (
     <Comp

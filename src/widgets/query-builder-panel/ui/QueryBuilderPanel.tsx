@@ -28,7 +28,7 @@ import {
   type Widget,
   type WidgetType,
 } from '@/entities/widget'
-import { useFormat } from '@/shared/lib'
+import { useDebouncedValue, useFormat } from '@/shared/lib'
 import { localize } from '@/shared/lib/localized'
 import type { DateRange, QuerySpec } from '@/shared/lib/query-engine'
 import { Button, Segmented } from '@/shared/ui'
@@ -55,6 +55,10 @@ export function QueryBuilderPanel({ widget, dateRange, onApply, onClose }: Query
   )
   const [dragging, setDragging] = useState<DatasetField | null>(null)
   const dataset = datasets.find((d) => d.id === query.datasetId) ?? datasets[0]
+  // The preview runs once typing pauses (a filter value, the limit) instead of
+  // once per keystroke; the sentence and the zones still update at once.
+  const previewQuery = useDebouncedValue(query, 200)
+  const previewDataset = datasets.find((d) => d.id === previewQuery.datasetId) ?? dataset
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor),
@@ -186,8 +190,8 @@ export function QueryBuilderPanel({ widget, dateRange, onApply, onClose }: Query
               </div>
               <Preview
                 widget={{ ...widget, type }}
-                query={runnable(query)}
-                dataset={dataset}
+                query={runnable(previewQuery)}
+                dataset={previewDataset ?? dataset}
                 dateRange={dateRange}
               />
             </section>

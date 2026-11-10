@@ -12,6 +12,7 @@ import {
   useTable,
 } from '@tanstack/react-table'
 import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, ChevronsUpDown } from 'lucide-react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn, formatNumber, useFormat } from '../lib'
@@ -49,26 +50,35 @@ const helper = createColumnHelper<typeof features, DataRow>()
 export function DataTable({
   columns,
   rows,
-  pageSize = 10,
+  pageSize: pageSizeProp,
   initialSort,
   className,
   label,
 }: DataTableProps) {
+  // TanStack Table keeps its state inside one stable `table` object, which the
+  // React Compiler would treat as unchanged and so skip re-rendering sorted or
+  // paged rows. Opt this component out and memoize by hand.
+  'use no memo'
   const { t } = useTranslation()
   const fmt = useFormat()
-  const defs = helper.columns(
-    columns.map((c) =>
-      helper.accessor((row) => row[c.key] as string | number | null, {
-        id: c.key,
-        header: c.header,
-        sortUndefined: 'last',
-        sortFn: c.align === 'end' ? 'basic' : 'text',
-        cell: (info) => {
-          const v = info.getValue()
-          return c.format ? c.format(v) : v === null ? '–' : String(v)
-        },
-      }),
-    ),
+  const pageSize = pageSizeProp ?? 10
+  const defs = useMemo(
+    () =>
+      helper.columns(
+        columns.map((c) =>
+          helper.accessor((row) => row[c.key] as string | number | null, {
+            id: c.key,
+            header: c.header,
+            sortUndefined: 'last',
+            sortFn: c.align === 'end' ? 'basic' : 'text',
+            cell: (info) => {
+              const v = info.getValue()
+              return c.format ? c.format(v) : v === null ? '–' : String(v)
+            },
+          }),
+        ),
+      ),
+    [columns],
   )
   const table = useTable({
     features,
@@ -79,7 +89,7 @@ export function DataTable({
       pagination: { pageIndex: 0, pageSize },
     },
   })
-  const alignOf = new Map(columns.map((c) => [c.key, c.align ?? 'start']))
+  const alignOf = useMemo(() => new Map(columns.map((c) => [c.key, c.align ?? 'start'])), [columns])
   const pageIndex = table.state.pagination.pageIndex
   const pageCount = Math.max(1, table.getPageCount())
   const first = rows.length === 0 ? 0 : pageIndex * pageSize + 1

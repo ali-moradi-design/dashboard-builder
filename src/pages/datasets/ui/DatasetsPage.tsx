@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Database, Trash2 } from 'lucide-react'
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   ensureDatasetLoaded,
   FieldTypeIcon,
   useDatasets,
+  useDatasetsReady,
   useDatasetsStore,
   type Dataset,
 } from '@/entities/dataset'
@@ -16,7 +16,7 @@ import { cn, formatNumber, useFormat } from '@/shared/lib'
 import { runQuery } from '@/shared/lib/duckdb'
 import { localize } from '@/shared/lib/localized'
 import { quoteIdent } from '@/shared/lib/query-engine'
-import { Button, Card, DataTable } from '@/shared/ui'
+import { Button, Card, DataTable, Skeleton } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
 
 function Preview({ dataset }: { dataset: Dataset }) {
@@ -30,7 +30,20 @@ function Preview({ dataset }: { dataset: Dataset }) {
         .rows
     },
   })
-  if (preview.isLoading) return <p className="text-muted">{t('common.loading')}</p>
+  if (preview.isLoading) {
+    return (
+      <div
+        className="flex flex-col gap-2"
+        role="status"
+        aria-busy="true"
+        aria-label={t('common.loading')}
+      >
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} className="h-7 rounded-md" />
+        ))}
+      </div>
+    )
+  }
   if (preview.error)
     return (
       <p role="alert" className="text-danger">
@@ -63,11 +76,10 @@ export function DatasetsPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
   const datasets = useDatasets()
-  const load = useDatasetsStore((s) => s.load)
+  const ready = useDatasetsReady()
   const remove = useDatasetsStore((s) => s.remove)
   const { id } = useSearch({ from: '/datasets' })
   const navigate = useNavigate({ from: '/datasets' })
-  useEffect(() => void load(), [load])
   const selected = datasets.find((d) => d.id === id) ?? datasets[0]
   const select = (d: Dataset) => void navigate({ search: { id: d.id }, replace: true })
 
@@ -107,6 +119,11 @@ export function DatasetsPage() {
                 </button>
               </li>
             ))}
+            {!ready && (
+              <li role="status" aria-busy="true" aria-label={t('common.loading')}>
+                <Skeleton className="h-15" />
+              </li>
+            )}
           </ul>
           <ImportCsvButton onImported={select} />
           <p className="text-xs text-muted">{t('datasets.privacy')}</p>

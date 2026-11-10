@@ -24,13 +24,7 @@ const registry = createRegistry(allFields)
 const renderers = createRenderers(basicRenderers)
 
 /** Live settings form: no buttons, every change is reported. */
-export function SettingsForm({
-  document,
-  values,
-  onChange,
-  locale,
-  digits = 'native',
-}: SettingsFormProps) {
+export function SettingsForm({ document, values, onChange, locale, digits }: SettingsFormProps) {
   return (
     <Form
       className="fc-form settings-form"
@@ -38,7 +32,7 @@ export function SettingsForm({
       registry={registry}
       renderers={renderers}
       locale={locale}
-      digits={digits}
+      digits={digits ?? 'native'}
       defaultValues={values}
       actions={false}
       onChange={onChange}

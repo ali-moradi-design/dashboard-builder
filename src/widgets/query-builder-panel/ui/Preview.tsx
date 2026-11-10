@@ -16,7 +16,7 @@ import {
 } from '@/entities/widget'
 import { formatNumber, useFormat } from '@/shared/lib'
 import type { DateRange, QuerySpec } from '@/shared/lib/query-engine'
-import { DataTable } from '@/shared/ui'
+import { DataTable, Skeleton } from '@/shared/ui'
 
 /** Live result of the draft query: the widget's chart and the raw rows. */
 export function Preview({
@@ -71,7 +71,9 @@ export function Preview({
               dataset={dataset}
             />
           ) : (
-            <div className="h-full animate-pulse rounded-lg bg-surface-2/60" />
+            <div className="h-full" role="status" aria-busy="true" aria-label={t('common.loading')}>
+              <Skeleton className="h-full" />
+            </div>
           )}
         </div>
       </div>

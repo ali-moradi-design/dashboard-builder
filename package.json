@@ -3,6 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "./src/app/**",
+    "./src/shared/lib/echarts/setup.ts"
+  ],
   "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=24"

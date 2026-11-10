@@ -1,8 +1,8 @@
 import { AlertCircle } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useDataset } from '@/entities/dataset'
+import { useDataset, useDatasetsReady } from '@/entities/dataset'
 import { useQueryResult } from '@/entities/query'
 import {
   checkQuery,
@@ -13,6 +13,7 @@ import {
 } from '@/entities/widget'
 import { cn } from '@/shared/lib'
 import type { DateRange } from '@/shared/lib/query-engine'
+import { Skeleton } from '@/shared/ui'
 
 export interface WidgetFrameProps {
   widget: Widget
@@ -23,7 +24,7 @@ export interface WidgetFrameProps {
   className?: string
 }
 
-function Message({ children, tone = 'muted' }: { children: ReactNode; tone?: 'muted' | 'danger' }) {
+function Message({ children, tone }: { children: ReactNode; tone?: 'muted' | 'danger' }) {
   return (
     <div
       className={cn(
@@ -39,9 +40,29 @@ function Message({ children, tone = 'muted' }: { children: ReactNode; tone?: 'mu
   )
 }
 
-function WidgetBody({ widget, dateRange }: { widget: Widget; dateRange: DateRange }) {
+function Loading() {
+  const { t } = useTranslation()
+  return (
+    <div className="h-full" role="status" aria-busy="true" aria-label={t('common.loading')}>
+      <Skeleton className="h-full" />
+    </div>
+  )
+}
+
+/**
+ * Memoized: a widget is re-rendered only when its own document, the date
+ * filter or its query result changes, not on every edit elsewhere on the page.
+ */
+const WidgetBody = memo(function WidgetBody({
+  widget,
+  dateRange,
+}: {
+  widget: Widget
+  dateRange: DateRange
+}) {
   const { t } = useTranslation()
   const dataset = useDataset(widget.query?.datasetId)
+  const datasetsReady = useDatasetsReady()
   const issue = checkQuery(widget.type, widget.query)
   const needsData = widgetDefinitions[widget.type].query !== null
   const result = useQueryResult(needsData && !issue ? widget.query : undefined, dataset, dateRange)
@@ -53,18 +74,12 @@ function WidgetBody({ widget, dateRange }: { widget: Widget; dateRange: DateRang
       <Renderer widget={widget} settings={settings} rows={[]} columns={[]} dataset={undefined} />
     )
   if (issue) return <Message>{t('widget.notSetUp')}</Message>
+  // Imported datasets are read from IndexedDB at startup: not "missing" until that finished.
+  if (!dataset && !datasetsReady) return <Loading />
   if (!dataset) return <Message tone="danger">{t('widget.datasetMissing')}</Message>
   if (result.compileError || result.error)
     return <Message tone="danger">{t('widget.failed')}</Message>
-  if (!result.rows || !result.compiled) {
-    return (
-      <div
-        className="h-full animate-pulse rounded-lg bg-surface-2/60"
-        aria-busy="true"
-        aria-label={t('common.loading')}
-      />
-    )
-  }
+  if (!result.rows || !result.compiled) return <Loading />
   if (result.rows.length === 0) return <Message>{t('widget.noData')}</Message>
   return (
     <div className={cn('h-full min-h-0 transition-opacity', result.isFetching && 'opacity-60')}>
@@ -77,10 +92,16 @@ function WidgetBody({ widget, dateRange }: { widget: Widget; dateRange: DateRang
       />
     </div>
   )
-}
+})
 
 /** Card around one widget: title, state handling (loading, empty, error) and the renderer. */
-export function WidgetFrame({ widget, dateRange, actions, selected, className }: WidgetFrameProps) {
+export const WidgetFrame = memo(function WidgetFrame({
+  widget,
+  dateRange,
+  actions,
+  selected,
+  className,
+}: WidgetFrameProps) {
   if (widget.type === 'heading') {
     return (
       <section
@@ -116,4 +137,4 @@ export function WidgetFrame({ widget, dateRange, actions, selected, className }:
       </div>
     </section>
   )
-}
+})

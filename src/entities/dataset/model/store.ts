@@ -13,19 +13,32 @@ interface DatasetsState {
   remove: (id: string) => Promise<void>
 }
 
+let loading: Promise<void> | undefined
+
 /** Built-in samples plus datasets the user imported (kept in IndexedDB). */
 export const useDatasetsStore = create<DatasetsState>()((set, get) => ({
   imported: [],
   ready: false,
-  load: async () => {
-    if (get().ready) return
-    try {
-      const db = await getStorage()
-      const rows = await db.getAll('datasets')
-      set({ imported: rows.map((r) => r.doc as Dataset), ready: true })
-    } catch {
-      set({ ready: true })
-    }
+  load: () => {
+    // One read per session, shared by every caller.
+    loading ??= (async () => {
+      try {
+        const db = await getStorage()
+        const rows = await db.getAll('datasets')
+        const stored = rows.map((r) => r.doc as Dataset)
+        // Keep datasets imported while the read was running.
+        set((s) => ({
+          imported: [
+            ...stored.filter((d) => !s.imported.some((x) => x.id === d.id)),
+            ...s.imported,
+          ],
+          ready: true,
+        }))
+      } catch {
+        set({ ready: true })
+      }
+    })()
+    return loading
   },
   add: async (dataset, bytes) => {
     if (dataset.source.kind !== 'csv') throw new Error('Only CSV datasets can be imported')
@@ -46,6 +59,11 @@ export const useDatasetsStore = create<DatasetsState>()((set, get) => ({
     set((s) => ({ imported: s.imported.filter((d) => d.id !== id) }))
   },
 }))
+
+/** False until the imported datasets were read from storage. */
+export function useDatasetsReady(): boolean {
+  return useDatasetsStore((s) => s.ready)
+}
 
 export function useDatasets(): readonly Dataset[] {
   const imported = useDatasetsStore((s) => s.imported)

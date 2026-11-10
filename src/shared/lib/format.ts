@@ -11,6 +11,41 @@ export function intlLocale({ lang, digits }: FormatContext): string {
   return 'en-US'
 }
 
+/*
+ * Constructing an Intl formatter is far more expensive than using one, and
+ * charts and tables format thousands of values per render. Formatters are
+ * immutable, so one instance per (locale, options) is shared.
+ */
+const numberFormats = new Map<string, Intl.NumberFormat>()
+function numberFormat(locale: string, percent: boolean, maxDigits: number): Intl.NumberFormat {
+  const key = `${locale}|${percent ? 'p' : 'n'}|${maxDigits}`
+  let f = numberFormats.get(key)
+  if (!f) {
+    f = new Intl.NumberFormat(locale, {
+      ...(percent ? { style: 'percent' as const } : {}),
+      maximumFractionDigits: maxDigits,
+    })
+    numberFormats.set(key, f)
+  }
+  return f
+}
+
+const dateFormats = new Map<string, Intl.DateTimeFormat>()
+/** Shared `Intl.DateTimeFormat` for a locale and options (`id` names the options). */
+export function dateTimeFormat(
+  locale: string,
+  id: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${locale}|${id}`
+  let f = dateFormats.get(key)
+  if (!f) {
+    f = new Intl.DateTimeFormat(locale, options)
+    dateFormats.set(key, f)
+  }
+  return f
+}
+
 export type NumberStyle = 'number' | 'compact' | 'percent' | 'currency'
 
 export interface NumberFormatOptions {
@@ -33,17 +68,12 @@ export function formatNumber(
   const decimals = opts.decimals
   if (!Number.isFinite(value)) return '–'
   if (style === 'percent') {
-    return new Intl.NumberFormat(locale, {
-      style: 'percent',
-      maximumFractionDigits: decimals ?? 1,
-    }).format(value)
+    return numberFormat(locale, true, decimals ?? 1).format(value)
   }
   const compact =
     style === 'compact' ||
     (style === 'currency' && Math.abs(value) >= 1e4 && decimals === undefined)
-  const base = new Intl.NumberFormat(locale, {
-    maximumFractionDigits: decimals ?? (compact ? 1 : 2),
-  })
+  const base = numberFormat(locale, false, decimals ?? (compact ? 1 : 2))
   let text: string
   if (compact) {
     const abs = Math.abs(value)
@@ -62,22 +92,29 @@ export function formatNumber(
   return text
 }
 
+const currencySymbols = new Map<string, string>()
 function currencySymbol(code: string): string {
-  const part = new Intl.NumberFormat('en-US', { style: 'currency', currency: code })
-    .formatToParts(0)
-    .find((p) => p.type === 'currency')
-  return part?.value ?? code + ' '
+  let symbol = currencySymbols.get(code)
+  if (symbol === undefined) {
+    const part = new Intl.NumberFormat('en-US', { style: 'currency', currency: code })
+      .formatToParts(0)
+      .find((p) => p.type === 'currency')
+    symbol = part?.value ?? code + ' '
+    currencySymbols.set(code, symbol)
+  }
+  return symbol
 }
 
 export type DateGrain = 'day' | 'week' | 'month' | 'year'
 
 export function formatDate(value: Date, ctx: FormatContext, grain: DateGrain = 'day'): string {
   const locale = intlLocale(ctx)
+  const id = grain === 'year' || grain === 'month' ? grain : 'day'
   const opts: Intl.DateTimeFormatOptions =
-    grain === 'year'
+    id === 'year'
       ? { year: 'numeric', timeZone: 'UTC' }
-      : grain === 'month'
+      : id === 'month'
         ? { year: 'numeric', month: 'short', timeZone: 'UTC' }
         : { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
-  return new Intl.DateTimeFormat(locale, opts).format(value)
+  return dateTimeFormat(locale, id, opts).format(value)
 }
