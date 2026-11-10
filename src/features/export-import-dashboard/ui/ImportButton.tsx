@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DashboardFormatError, type Dashboard } from '@/entities/dashboard'
-import { Button } from '@/shared/ui'
+import { Button, Spinner } from '@/shared/ui'
 
 import { readDashboardFile } from '../model/transfer'
 
@@ -16,6 +16,7 @@ export function ImportButton({ existingIds, onImport }: ImportButtonProps) {
   const { t } = useTranslation()
   const input = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
   return (
     <div className="flex flex-col items-end gap-1">
       <input
@@ -31,6 +32,7 @@ export function ImportButton({ existingIds, onImport }: ImportButtonProps) {
           e.target.value = ''
           if (!file) return
           setError(null)
+          setBusy(true)
           void readDashboardFile(file, existingIds)
             .then(onImport)
             .catch((err: unknown) =>
@@ -42,10 +44,11 @@ export function ImportButton({ existingIds, onImport }: ImportButtonProps) {
                     : t('transfer.notJson'),
               ),
             )
+            .then(() => setBusy(false))
         }}
       />
-      <Button onClick={() => input.current?.click()}>
-        <Upload aria-hidden />
+      <Button onClick={() => input.current?.click()} disabled={busy}>
+        {busy ? <Spinner /> : <Upload aria-hidden />}
         {t('transfer.import')}
       </Button>
       {error && (

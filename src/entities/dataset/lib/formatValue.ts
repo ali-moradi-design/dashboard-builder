@@ -1,4 +1,5 @@
 import {
+  dateTimeFormat,
   formatDate,
   formatNumber,
   intlLocale,
@@ -29,7 +30,7 @@ export function formatDimensionValue(
   }
   if (field?.display === 'weekday' && typeof value === 'number') {
     // 2024-01-01 was a Monday (ISO weekday 1).
-    return new Intl.DateTimeFormat(intlLocale(ctx), { weekday: 'short', timeZone: 'UTC' }).format(
+    return dateTimeFormat(intlLocale(ctx), 'weekday', { weekday: 'short', timeZone: 'UTC' }).format(
       new Date(Date.UTC(2024, 0, value)),
     )
   }

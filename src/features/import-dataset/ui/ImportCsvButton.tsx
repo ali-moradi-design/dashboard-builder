@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDatasetsStore, type Dataset } from '@/entities/dataset'
-import { Button } from '@/shared/ui'
+import { Button, Spinner } from '@/shared/ui'
 
 import { importCsv } from '../model/importCsv'
 
@@ -18,21 +18,27 @@ export function ImportCsvButton({ onImported }: { onImported?: (dataset: Dataset
     if (!file) return
     setBusy(true)
     setError(null)
+    // Plain statements only inside try/catch: the React Compiler skips components
+    // with conditionals there.
+    let imported: Dataset | undefined
+    let failure: unknown
     try {
-      const { dataset, bytes } = await importCsv(file)
-      await add(dataset, bytes)
-      onImported?.(dataset)
+      const result = await importCsv(file)
+      await add(result.dataset, result.bytes)
+      imported = result.dataset
     } catch (e) {
+      failure = e
       console.error('CSV import failed', e)
+    }
+    if (imported) onImported?.(imported)
+    else
       setError(
-        e instanceof Error && e.message === 'tooLarge'
+        failure instanceof Error && failure.message === 'tooLarge'
           ? t('datasets.tooLarge')
           : t('datasets.importFailed'),
       )
-    } finally {
-      setBusy(false)
-      if (input.current) input.current.value = ''
-    }
+    setBusy(false)
+    if (input.current) input.current.value = ''
   }
 
   return (
@@ -48,7 +54,7 @@ export function ImportCsvButton({ onImported }: { onImported?: (dataset: Dataset
         data-testid="csv-input"
       />
       <Button onClick={() => input.current?.click()} disabled={busy}>
-        <Upload aria-hidden />
+        {busy ? <Spinner /> : <Upload aria-hidden />}
         {busy ? t('common.loading') : t('datasets.importCsv')}
       </Button>
       {error && (

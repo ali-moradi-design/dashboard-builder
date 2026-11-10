@@ -1,6 +1,12 @@
 export { ensureDatasetLoaded } from './api/load'
 export { sampleDatasets } from './config/samples'
-export { getDataset, useDataset, useDatasets, useDatasetsStore } from './model/store'
+export {
+  getDataset,
+  useDataset,
+  useDatasets,
+  useDatasetsReady,
+  useDatasetsStore,
+} from './model/store'
 export { fieldTypeFromDuckDB, findField, toQuerySchema } from './model/types'
 export type { Dataset, DatasetField, DatasetSource } from './model/types'
 export { FieldTypeIcon } from './ui/FieldTypeIcon'

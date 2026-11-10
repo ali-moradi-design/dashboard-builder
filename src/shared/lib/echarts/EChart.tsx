@@ -20,9 +20,23 @@ export function EChart({ option, label, className }: EChartProps) {
     if (!node) return
     const instance = echarts.init(node, undefined, { renderer: 'canvas' })
     chart.current = instance
-    const observer = new ResizeObserver(() => instance.resize())
+    // Resizing a widget fires many observations per frame: redraw once per frame,
+    // and skip the first one (the chart was just created at this size).
+    let frame = 0
+    let width = node.clientWidth
+    let height = node.clientHeight
+    const observer = new ResizeObserver(() => {
+      if (node.clientWidth === width && node.clientHeight === height) return
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        width = node.clientWidth
+        height = node.clientHeight
+        instance.resize()
+      })
+    })
     observer.observe(node)
     return () => {
+      cancelAnimationFrame(frame)
       observer.disconnect()
       instance.dispose()
       chart.current = null

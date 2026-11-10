@@ -9,15 +9,15 @@ export const PopoverClose = P.Close
 
 export function PopoverContent({
   className,
-  align = 'start',
-  sideOffset = 6,
+  align,
+  sideOffset,
   ...props
 }: ComponentProps<typeof P.Content>) {
   return (
     <P.Portal>
       <P.Content
-        align={align}
-        sideOffset={sideOffset}
+        align={align ?? 'start'}
+        sideOffset={sideOffset ?? 6}
         className={cn(
           'z-50 rounded-xl border border-border bg-surface p-3 text-text shadow-xl outline-none',
           className,

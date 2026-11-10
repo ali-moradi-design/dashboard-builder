@@ -1,19 +1,25 @@
 import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { Check, Copy, MousePointerClick, Trash2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { memo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDashboard, useEditor, useSaveDashboard } from '@/entities/dashboard'
 import { useDataset } from '@/entities/dataset'
+import type { Widget } from '@/entities/widget'
 import { WidgetPalette, useAddWidget } from '@/features/add-widget'
-import { DateRangeFilter } from '@/features/apply-date-filter'
+import { DateRangeFilter, useDateRange } from '@/features/apply-date-filter'
 import { UndoRedoButtons } from '@/features/undo-redo'
 import { cn } from '@/shared/lib'
 import type { DateRange } from '@/shared/lib/query-engine'
 import { useSettings } from '@/shared/model'
 import { Button } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
-import { EditableGrid, WIDGET_MIME, widgetTypeMime } from '@/widgets/dashboard-grid'
+import {
+  DashboardGridSkeleton,
+  EditableGrid,
+  WIDGET_MIME,
+  widgetTypeMime,
+} from '@/widgets/dashboard-grid'
 import { QueryBuilderPanel } from '@/widgets/query-builder-panel'
 import { WidgetFrame } from '@/widgets/widget-frame'
 import { WidgetSettingsPanel } from '@/widgets/widget-settings-panel'
@@ -22,22 +28,116 @@ const isTyping = (el: EventTarget | null) =>
   el instanceof HTMLElement &&
   (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))
 
-/** Saves the draft shortly after each change. */
+/**
+ * Saves the draft shortly after each change, and at once when the page is left
+ * with unsaved changes (e.g. "Done" right after an edit).
+ */
 function useAutosave() {
-  const save = useSaveDashboard()
+  const { mutate, isPending, error } = useSaveDashboard()
   const dashboard = useEditor((s) => s.dashboard)
   const dirty = useEditor((s) => s.dirty)
-  const timer = useRef<number | undefined>(undefined)
+
   useEffect(() => {
     if (!dashboard || !dirty) return
-    window.clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => {
-      save.mutate(dashboard, { onSuccess: () => useEditor.getState().markSaved() })
+    const timer = window.setTimeout(() => {
+      mutate(dashboard, {
+        onSuccess: () => {
+          // An edit made while this save was running still has to be saved.
+          const now = useEditor.getState()
+          if (now.dashboard === dashboard) now.markSaved()
+        },
+      })
     }, 500)
-    return () => window.clearTimeout(timer.current)
-  }, [dashboard, dirty, save])
-  return { saving: dirty || save.isPending, error: save.error }
+    return () => window.clearTimeout(timer)
+  }, [dashboard, dirty, mutate])
+
+  useEffect(
+    () => () => {
+      const { dashboard: draft, dirty: unsaved, markSaved } = useEditor.getState()
+      if (!draft || !unsaved) return
+      mutate(draft)
+      markSaved()
+    },
+    [mutate],
+  )
+
+  return { saving: dirty || isPending, error }
 }
+
+interface EditableWidgetProps {
+  widget: Widget
+  selected: boolean
+  dateRange: DateRange
+}
+
+/**
+ * One widget on the edit grid. Memoized, so an edit (typing a title, moving
+ * another widget, changing the selection) re-renders only the widgets it
+ * actually changes instead of redrawing every chart.
+ */
+const EditableWidget = memo(function EditableWidget({
+  widget,
+  selected,
+  dateRange,
+}: EditableWidgetProps) {
+  const { t } = useTranslation()
+  const select = useEditor((s) => s.select)
+  const removeWidget = useEditor((s) => s.removeWidget)
+  const duplicateWidget = useEditor((s) => s.duplicateWidget)
+  const id = widget.id
+  return (
+    <div
+      className="h-full"
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
+      aria-label={t('editor.selectWidget', {
+        title: widget.title || t(`widgetTypes.${widget.type}`),
+      })}
+      onMouseDown={() => select(id)}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          select(id)
+        }
+      }}
+    >
+      <WidgetFrame
+        widget={widget}
+        dateRange={dateRange}
+        selected={selected}
+        className={cn(!selected && 'border-dashed', 'cursor-move')}
+        actions={
+          <span
+            className={cn(
+              'flex gap-0.5',
+              selected
+                ? 'opacity-100'
+                : 'opacity-0 group-focus-within:opacity-100 group-hover:opacity-100',
+            )}
+          >
+            <Button
+              size="iconSm"
+              variant="ghost"
+              aria-label={t('editor.duplicate')}
+              onClick={() => duplicateWidget(id)}
+            >
+              <Copy aria-hidden />
+            </Button>
+            <Button
+              size="iconSm"
+              variant="ghost"
+              aria-label={t('common.delete')}
+              onClick={() => removeWidget(id)}
+            >
+              <Trash2 aria-hidden />
+            </Button>
+          </span>
+        }
+      />
+    </div>
+  )
+})
 
 export function DashboardEditPage() {
   const { t } = useTranslation()
@@ -48,8 +148,11 @@ export function DashboardEditPage() {
   const dashboard = useEditor((s) => s.dashboard)
   const selectedId = useEditor((s) => s.selectedId)
   const historyRev = useEditor((s) => s.historyRev)
-  const { select, setTitle, updateLayouts, updateWidget, removeWidget, duplicateWidget } =
-    useEditor.getState()
+  // Actions come through selectors (stable references), not `getState()` during
+  // render: the React Compiler skips components that read a hook as a value.
+  const setTitle = useEditor((s) => s.setTitle)
+  const updateLayouts = useEditor((s) => s.updateLayouts)
+  const updateWidget = useEditor((s) => s.updateWidget)
   const add = useAddWidget()
   const rtl = useSettings((s) => s.lang) === 'fa'
   const { saving } = useAutosave()
@@ -81,18 +184,21 @@ export function DashboardEditPage() {
 
   const datasetId = dashboard?.widgets.find((w) => w.query)?.query?.datasetId
   const dataset = useDataset(datasetId)
-  const urlHasRange = search.from !== undefined || search.to !== undefined
-  const dateRange: DateRange = urlHasRange
-    ? { from: search.from, to: search.to }
-    : (dashboard?.dateRange ?? {})
+  const dateRange = useDateRange(search, dashboard?.dateRange)
 
   if (stored.isLoading || !dashboard || dashboard.id !== dashboardId) {
+    // Still reading from storage, or read and about to be loaded into the editor.
+    const loading = stored.isLoading || Boolean(stored.data)
     return (
       <>
         <AppHeader />
-        <p className="p-8 text-muted">
-          {stored.isLoading || stored.data ? t('common.loading') : t('common.notFound')}
-        </p>
+        <main className="p-4 sm:p-5">
+          {loading ? (
+            <DashboardGridSkeleton label={t('common.loading')} />
+          ) : (
+            <p className="p-4 text-muted">{t('common.notFound')}</p>
+          )}
+        </main>
       </>
     )
   }
@@ -169,56 +275,7 @@ export function DashboardEditPage() {
             onCommit={updateLayouts}
             onDropType={(type, at) => add(type, at)}
             renderWidget={(w) => (
-              <div
-                className="h-full"
-                role="button"
-                tabIndex={0}
-                aria-pressed={w.id === selectedId}
-                aria-label={t('editor.selectWidget', {
-                  title: w.title || t(`widgetTypes.${w.type}`),
-                })}
-                onMouseDown={() => select(w.id)}
-                onKeyDown={(e) => {
-                  if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault()
-                    select(w.id)
-                  }
-                }}
-              >
-                <WidgetFrame
-                  widget={w}
-                  dateRange={dateRange}
-                  selected={w.id === selectedId}
-                  className={cn(w.id !== selectedId && 'border-dashed', 'cursor-move')}
-                  actions={
-                    <span
-                      className={cn(
-                        'flex gap-0.5',
-                        w.id === selectedId
-                          ? 'opacity-100'
-                          : 'opacity-0 group-focus-within:opacity-100 group-hover:opacity-100',
-                      )}
-                    >
-                      <Button
-                        size="iconSm"
-                        variant="ghost"
-                        aria-label={t('editor.duplicate')}
-                        onClick={() => duplicateWidget(w.id)}
-                      >
-                        <Copy aria-hidden />
-                      </Button>
-                      <Button
-                        size="iconSm"
-                        variant="ghost"
-                        aria-label={t('common.delete')}
-                        onClick={() => removeWidget(w.id)}
-                      >
-                        <Trash2 aria-hidden />
-                      </Button>
-                    </span>
-                  }
-                />
-              </div>
+              <EditableWidget widget={w} selected={w.id === selectedId} dateRange={dateRange} />
             )}
           />
         </main>

@@ -116,3 +116,13 @@ test('changes widget settings in the formcanvas form and undoes them', async ({ 
   await page.getByLabel('First color').selectOption('2')
   await expect(page.getByLabel('First color')).toHaveValue('2')
 })
+
+test('keeps an edit made right before leaving the editor', async ({ page }) => {
+  await newDashboard(page)
+  await page.getByLabel('Dashboard title').fill('Quarterly review')
+  // No waiting for autosave: "Done" must not drop the pending change.
+  await page.getByRole('link', { name: 'Done' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: 'Quarterly review' })).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 1, name: 'Quarterly review' })).toBeVisible()
+})

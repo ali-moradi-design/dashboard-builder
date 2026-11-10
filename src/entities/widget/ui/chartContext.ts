@@ -86,7 +86,7 @@ export function legend(theme: ChartTheme, show: boolean) {
   return {
     show,
     top: 0,
-    [theme.rtl ? 'right' : 'left']: 0,
+    ...(theme.rtl ? { right: 0 } : { left: 0 }),
     icon: 'roundRect',
     itemWidth: 10,
     itemHeight: 10,

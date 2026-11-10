@@ -226,6 +226,41 @@ Files: `src/features/export-import-dashboard`, `e2e/*`,
 - Deploy: static site; Nginx with SPA fallback, long cache for hashed assets,
   wasm MIME type and gzip.
 
+### Part 12 — Performance pass (renders, loading states)
+
+Measured first (render and `setOption` counters in a dev build, driven by
+Playwright), then fixed what the numbers showed.
+
+- Extra renders: typing five letters in a title redrew every chart 7 times
+  (49 `setOption` calls); selecting a widget redrew all of them. Cause: the
+  React Compiler silently skipped some components, so their children got new
+  props on every render. It skips (with this Babel 8 setup) components with
+  default values in the parameter destructuring, a hook read as a value during
+  render (`useEditor.getState()`), computed object keys and conditionals inside
+  `try/catch`. Fixed those patterns; `WidgetBody`, `WidgetFrame` and the new
+  `EditableWidget` are also `memo`, and `useDateRange` keeps the date range's
+  identity. After: 0 redraws for the same actions.
+  Files: `pages/dashboard-edit`, `widgets/widget-frame`,
+  `features/apply-date-filter/model/useDateRange.ts`.
+- `DataTable` opts out of the compiler (`'use no memo'`): TanStack Table keeps
+  state in one stable object, which the compiler would treat as unchanged.
+- `Intl.NumberFormat` / `DateTimeFormat` instances are cached per locale and
+  options (`shared/lib/format.ts`); charts and tables format thousands of values.
+- ECharts resizes once per frame; Arrow results are converted column by column;
+  the query builder preview waits 200 ms after typing.
+- Loading states: `Skeleton` / `Spinner` in `shared/ui`; skeletons for the
+  dashboards list, the dashboard view/edit pages, the dataset preview and a
+  page whose code is still downloading (`defaultPendingComponent`); a spinner
+  in `index.html` until the app starts; `public/boot.js` applies the saved
+  theme and language before the first paint (the CSP forbids inline scripts).
+- Route loaders read the dashboard and start DuckDB while the page chunk loads.
+- `sideEffects` in `package.json` lets the bundler keep `react-grid-layout`
+  out of the view page's chunks.
+- Bugs found on the way: imported CSV datasets were only loaded on the
+  Datasets page, so a dashboard using one showed "dataset missing" after a
+  reload; an edit made less than 500 ms before "Done" was not saved; a failed
+  DuckDB start was cached forever.
+
 ## Problems met during the build (good teaching examples)
 
 - Squash merges left the session branch with old commits → PR conflicts;

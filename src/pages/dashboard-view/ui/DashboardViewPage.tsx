@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next'
 
 import { useDashboard } from '@/entities/dashboard'
 import { useDataset } from '@/entities/dataset'
-import { DateRangeFilter } from '@/features/apply-date-filter'
+import { DateRangeFilter, useDateRange } from '@/features/apply-date-filter'
 import { ExportButton } from '@/features/export-import-dashboard'
-import type { DateRange } from '@/shared/lib/query-engine'
 import { Button } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
-import { DashboardGrid } from '@/widgets/dashboard-grid'
+import { DashboardGrid, DashboardGridSkeleton } from '@/widgets/dashboard-grid'
 import { WidgetFrame } from '@/widgets/widget-frame'
 
 export function DashboardViewPage() {
@@ -20,12 +19,18 @@ export function DashboardViewPage() {
   const { data: dashboard, isLoading } = useDashboard(dashboardId)
   const mainDatasetId = dashboard?.widgets.find((w) => w.query)?.query?.datasetId
   const dataset = useDataset(mainDatasetId)
-  const urlHasRange = search.from !== undefined || search.to !== undefined
-  const dateRange: DateRange = urlHasRange
-    ? { from: search.from, to: search.to }
-    : (dashboard?.dateRange ?? {})
+  const dateRange = useDateRange(search, dashboard?.dateRange)
 
-  if (isLoading) return <AppHeader />
+  if (isLoading) {
+    return (
+      <>
+        <AppHeader />
+        <main className="p-4 sm:p-5">
+          <DashboardGridSkeleton label={t('common.loading')} />
+        </main>
+      </>
+    )
+  }
   if (!dashboard) {
     return (
       <>

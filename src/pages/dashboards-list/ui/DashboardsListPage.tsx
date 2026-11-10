@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { newId, useDashboards, useDeleteDashboard, useSaveDashboard } from '@/entities/dashboard'
 import { ImportButton } from '@/features/export-import-dashboard'
 import { formatDate, formatNumber, useFormat } from '@/shared/lib'
-import { Button, Card } from '@/shared/ui'
+import { Button, Card, Skeleton, Spinner } from '@/shared/ui'
 import { AppHeader } from '@/widgets/app-header'
 
 export function DashboardsListPage() {
@@ -47,13 +47,24 @@ export function DashboardsListPage() {
               }}
             />
             <Button variant="primary" onClick={() => void create()} disabled={save.isPending}>
-              <Plus aria-hidden />
+              {save.isPending ? <Spinner /> : <Plus aria-hidden />}
               {t('list.new')}
             </Button>
           </div>
         </div>
         {isLoading ? (
-          <p className="mt-8 text-muted">{t('common.loading')}</p>
+          <ul
+            className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            role="status"
+            aria-busy="true"
+            aria-label={t('common.loading')}
+          >
+            {[0, 1, 2].map((i) => (
+              <li key={i}>
+                <Skeleton className="h-32 rounded-card" />
+              </li>
+            ))}
+          </ul>
         ) : !dashboards?.length ? (
           <p className="mt-8 text-muted">{t('list.empty')}</p>
         ) : (
@@ -96,6 +107,7 @@ export function DashboardsListPage() {
                       size="sm"
                       variant="ghost"
                       aria-label={t('list.deleteNamed', { name: d.title })}
+                      disabled={remove.isPending && remove.variables === d.id}
                       onClick={() => {
                         if (window.confirm(t('list.confirmDelete', { name: d.title })))
                           remove.mutate(d.id)

@@ -14,14 +14,26 @@ let dbPromise: Promise<duckdb.AsyncDuckDB> | undefined
 
 /** One DuckDB instance per tab, running in a Web Worker. Created on first use. */
 export function getDuckDB(): Promise<duckdb.AsyncDuckDB> {
-  dbPromise ??= (async () => {
-    const bundle = await duckdb.selectBundle(bundles)
-    if (!bundle.mainWorker) throw new Error('No DuckDB worker bundle')
-    const worker = new Worker(bundle.mainWorker)
-    const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker)
-    await db.instantiate(bundle.mainModule, bundle.pthreadWorker)
-    return db
-  })()
+  if (!dbPromise) {
+    const starting = (async () => {
+      const bundle = await duckdb.selectBundle(bundles)
+      if (!bundle.mainWorker) throw new Error('No DuckDB worker bundle')
+      const worker = new Worker(bundle.mainWorker)
+      try {
+        const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker)
+        await db.instantiate(bundle.mainModule, bundle.pthreadWorker)
+        return db
+      } catch (e) {
+        worker.terminate()
+        throw e
+      }
+    })()
+    dbPromise = starting
+    // A failed start (e.g. the download was interrupted) must not stick: retry on next use.
+    starting.catch(() => {
+      if (dbPromise === starting) dbPromise = undefined
+    })
+  }
   return dbPromise
 }
 
@@ -91,16 +103,15 @@ export async function execute(sql: string): Promise<void> {
 export function toResult(table: Table): QueryResult {
   const fields = table.schema.fields
   const columns = fields.map((f) => ({ name: f.name, type: String(f.type) }))
-  const converters = fields.map((f) => converterFor(f.type as DataType))
-  const rows: Row[] = []
-  const cols = fields.map((_, i) => table.getChildAt(i))
-  for (let r = 0; r < table.numRows; r++) {
-    const row: Row = {}
-    fields.forEach((f, i) => {
-      row[f.name] = converters[i]?.(cols[i]?.get(r))
-    })
-    rows.push(row)
-  }
+  const numRows = table.numRows
+  const rows: Row[] = Array.from({ length: numRows }, () => ({}))
+  // Column by column: one converter and one vector lookup per column, not per cell.
+  fields.forEach((f, i) => {
+    const convert = converterFor(f.type as DataType)
+    const col = table.getChildAt(i)
+    const name = f.name
+    for (let r = 0; r < numRows; r++) (rows[r] as Row)[name] = convert(col?.get(r))
+  })
   return { rows, columns }
 }
 
@@ -114,8 +125,7 @@ function converterFor(type: DataType): (v: unknown) => unknown {
     }
   }
   if (DataType.isInt(type) || DataType.isDecimal(type)) {
-    return (v) =>
-      v === null || v === undefined ? null : typeof v === 'bigint' ? Number(v) : Number(v)
+    return (v) => (v === null || v === undefined ? null : Number(v))
   }
   return (v) => (typeof v === 'bigint' ? Number(v) : v)
 }

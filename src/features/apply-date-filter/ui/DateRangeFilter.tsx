@@ -5,7 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { useDateExtent, type Dataset } from '@/entities/dataset'
 import { cn, formatDate, useFormat } from '@/shared/lib'
 import type { DateRange } from '@/shared/lib/query-engine'
-import { Button, Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/shared/ui'
+import {
+  Button,
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+  Skeleton,
+} from '@/shared/ui'
 
 export interface DateRangeFilterProps {
   value: DateRange
@@ -64,6 +71,12 @@ export function DateRangeFilter({ value, onChange, dataset }: DateRangeFilterPro
                   {t('dateFilter.allTime')}
                 </Button>
               </PopoverClose>
+              {extent.isLoading && (
+                <>
+                  <Skeleton className="h-8 w-14" />
+                  <Skeleton className="h-8 w-14" />
+                </>
+              )}
               {years.map((y) => (
                 <PopoverClose asChild key={y}>
                   <Button
