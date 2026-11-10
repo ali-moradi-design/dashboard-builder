@@ -60,12 +60,23 @@ export function EditableGrid({
   const rows = widgets.reduce((m, w) => Math.max(m, w.layout.y + w.layout.h), 0) + 4
   const minHeight = `max(60vh, ${rows * (ROW_HEIGHT + GAP)}px)`
 
-  const commit = (next: Layout) =>
+  // Marks the grid while a widget is moved or resized (styled in index.css).
+  // Set on the element directly: no re-render in the middle of a drag.
+  const setDragging = (on: boolean) => {
+    const el = containerRef.current
+    if (!el) return
+    if (on) el.dataset.dragging = ''
+    else delete el.dataset.dragging
+  }
+
+  const commit = (next: Layout) => {
+    setDragging(false)
     onCommit(
       next
         .filter((l) => l.i !== '__drop__')
         .map((l) => ({ i: l.i, x: mirror(l.x, l.w), y: l.y, w: l.w, h: l.h })),
     )
+  }
 
   return (
     <div
@@ -101,6 +112,8 @@ export function EditableGrid({
               return widgetDefinitions[type].defaultSize
             },
           }}
+          onDragStart={() => setDragging(true)}
+          onResizeStart={() => setDragging(true)}
           onDragStop={(next: Layout) => commit(next)}
           onResizeStop={(next: Layout) => commit(next)}
           onDrop={(_next: Layout, item: LayoutItem | undefined, e: Event) => {
