@@ -101,23 +101,56 @@
   opacity: 1;
   border-radius: 10px;
 }
-/* Dragging starts on the widget itself: its text must not get selected. */
-.editable-grid .react-grid-item {
-  user-select: none;
+.editable-grid .react-grid-item.react-grid-placeholder {
+  transition-duration: 120ms;
 }
 /*
- * While a widget is moved or resized, widgets ignore the pointer: charts under
- * the cursor would otherwise show tooltips and redraw on every mouse move.
+ * Dragging starts on the widget itself: its text must not get selected.
+ * Widgets pushed aside glide to their new place with a soft ease-out, and
+ * layout work inside one widget stays inside it (`contain`).
  */
-.editable-grid[data-dragging] .react-grid-item > * {
-  pointer-events: none;
+.editable-grid .react-grid-item {
+  user-select: none;
+  contain: layout style;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/*
+ * While a widget is moved or resized:
+ * - every widget gets its own compositor layer, so widgets that slide aside
+ *   are moved by the GPU instead of being repainted (charts are canvases);
+ * - one invisible sheet covers the page, so charts and buttons under the
+ *   pointer do not react (no tooltips, no hover redraws) and the cursor stays
+ *   the same. Cheaper than switching `pointer-events` on every widget.
+ */
+.editable-grid[data-dragging] .react-grid-item {
+  will-change: transform;
+}
+.editable-grid[data-dragging]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  cursor: grabbing;
+}
+.editable-grid[data-dragging='resize']::after {
+  cursor: nwse-resize;
+}
+.editable-grid[data-dragging='resize-rtl']::after {
+  cursor: nesw-resize;
 }
 .editable-grid[data-dragging] .chart-tooltip {
   display: none !important;
 }
 .editable-grid .react-grid-item.react-draggable-dragging {
   z-index: 20;
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.25);
+  box-shadow: 0 16px 36px rgb(0 0 0 / 0.28);
+  cursor: grabbing;
+}
+@media (prefers-reduced-motion: reduce) {
+  .editable-grid .react-grid-item {
+    transition-duration: 0ms;
+  }
 }
 .editable-grid .react-grid-item > .react-resizable-handle::after {
   border-color: var(--muted);
